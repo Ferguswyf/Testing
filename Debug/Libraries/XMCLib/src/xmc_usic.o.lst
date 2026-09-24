@@ -1,0 +1,1091 @@
+   1              	 .cpu cortex-m0
+   2              	 .fpu softvfp
+   3              	 .eabi_attribute 20,1
+   4              	 .eabi_attribute 21,1
+   5              	 .eabi_attribute 23,3
+   6              	 .eabi_attribute 24,1
+   7              	 .eabi_attribute 25,1
+   8              	 .eabi_attribute 26,1
+   9              	 .eabi_attribute 30,6
+  10              	 .eabi_attribute 34,0
+  11              	 .eabi_attribute 18,4
+  12              	 .code 16
+  13              	 .file "xmc_usic.c"
+  14              	 .text
+  15              	.Ltext0:
+  16              	 .cfi_sections .debug_frame
+  17              	 .section .text.XMC_USIC_CH_Enable,"ax",%progbits
+  18              	 .align 2
+  19              	 .global XMC_USIC_CH_Enable
+  20              	 .code 16
+  21              	 .thumb_func
+  23              	XMC_USIC_CH_Enable:
+  24              	.LFB93:
+  25              	 .file 1 "../Libraries/XMCLib/src/xmc_usic.c"
+   1:../Libraries/XMCLib/src/xmc_usic.c **** /**
+   2:../Libraries/XMCLib/src/xmc_usic.c ****  * @file xmc_usic.c
+   3:../Libraries/XMCLib/src/xmc_usic.c ****  * @date 2015-06-20
+   4:../Libraries/XMCLib/src/xmc_usic.c ****  *
+   5:../Libraries/XMCLib/src/xmc_usic.c ****  * @cond
+   6:../Libraries/XMCLib/src/xmc_usic.c ****   *************************************************************************************************
+   7:../Libraries/XMCLib/src/xmc_usic.c ****  * XMClib v2.0.0 - XMC Peripheral Driver Library
+   8:../Libraries/XMCLib/src/xmc_usic.c ****  *
+   9:../Libraries/XMCLib/src/xmc_usic.c ****  * Copyright (c) 2015, Infineon Technologies AG
+  10:../Libraries/XMCLib/src/xmc_usic.c ****  * All rights reserved.                        
+  11:../Libraries/XMCLib/src/xmc_usic.c ****  *                                             
+  12:../Libraries/XMCLib/src/xmc_usic.c ****  * Redistribution and use in source and binary forms, with or without modification,are permitted pr
+  13:../Libraries/XMCLib/src/xmc_usic.c ****  * following conditions are met:   
+  14:../Libraries/XMCLib/src/xmc_usic.c ****  *                                                                              
+  15:../Libraries/XMCLib/src/xmc_usic.c ****  * Redistributions of source code must retain the above copyright notice, this list of conditions a
+  16:../Libraries/XMCLib/src/xmc_usic.c ****  * disclaimer.                        
+  17:../Libraries/XMCLib/src/xmc_usic.c ****  * 
+  18:../Libraries/XMCLib/src/xmc_usic.c ****  * Redistributions in binary form must reproduce the above copyright notice, this list of condition
+  19:../Libraries/XMCLib/src/xmc_usic.c ****  * disclaimer in the documentation and/or other materials provided with the distribution.          
+  20:../Libraries/XMCLib/src/xmc_usic.c ****  * 
+  21:../Libraries/XMCLib/src/xmc_usic.c ****  * Neither the name of the copyright holders nor the names of its contributors may be used to endor
+  22:../Libraries/XMCLib/src/xmc_usic.c ****  * products derived from this software without specific prior written permission.                  
+  23:../Libraries/XMCLib/src/xmc_usic.c ****  *                                                                              
+  24:../Libraries/XMCLib/src/xmc_usic.c ****  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR I
+  25:../Libraries/XMCLib/src/xmc_usic.c ****  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTI
+  26:../Libraries/XMCLib/src/xmc_usic.c ****  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, IN
+  27:../Libraries/XMCLib/src/xmc_usic.c ****  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBS
+  28:../Libraries/XMCLib/src/xmc_usic.c ****  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THE
+  29:../Libraries/XMCLib/src/xmc_usic.c ****  * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+  30:../Libraries/XMCLib/src/xmc_usic.c ****  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                            
+  31:../Libraries/XMCLib/src/xmc_usic.c ****  *                                                                              
+  32:../Libraries/XMCLib/src/xmc_usic.c ****  * To improve the quality of the software, users are encouraged to share modifications, enhancement
+  33:../Libraries/XMCLib/src/xmc_usic.c ****  * Infineon Technologies AG dave@infineon.com).                                                    
+  34:../Libraries/XMCLib/src/xmc_usic.c ****  **************************************************************************************************
+  35:../Libraries/XMCLib/src/xmc_usic.c ****  *
+  36:../Libraries/XMCLib/src/xmc_usic.c ****  * Change History
+  37:../Libraries/XMCLib/src/xmc_usic.c ****  * --------------
+  38:../Libraries/XMCLib/src/xmc_usic.c ****  *
+  39:../Libraries/XMCLib/src/xmc_usic.c ****  * 2015-02-20:
+  40:../Libraries/XMCLib/src/xmc_usic.c ****  *     - Initial draft <br>
+  41:../Libraries/XMCLib/src/xmc_usic.c ****  *     - Documentation improved <br>
+  42:../Libraries/XMCLib/src/xmc_usic.c ****  *
+  43:../Libraries/XMCLib/src/xmc_usic.c ****  * 2015-05-08:
+  44:../Libraries/XMCLib/src/xmc_usic.c ****  *     - Clearing bit fields PDIV, PCTQ, PPPEN in XMC_USIC_CH_SetBaudrate() API  <br>
+  45:../Libraries/XMCLib/src/xmc_usic.c ****  *      
+  46:../Libraries/XMCLib/src/xmc_usic.c ****  * 2015-06-20:
+  47:../Libraries/XMCLib/src/xmc_usic.c ****  *     - Removed version macros and declaration of GetDriverVersion API
+  48:../Libraries/XMCLib/src/xmc_usic.c ****  *
+  49:../Libraries/XMCLib/src/xmc_usic.c ****  * @endcond
+  50:../Libraries/XMCLib/src/xmc_usic.c ****  *
+  51:../Libraries/XMCLib/src/xmc_usic.c ****  */
+  52:../Libraries/XMCLib/src/xmc_usic.c **** 
+  53:../Libraries/XMCLib/src/xmc_usic.c **** /*******************************************************************************
+  54:../Libraries/XMCLib/src/xmc_usic.c ****  * HEADER FILES
+  55:../Libraries/XMCLib/src/xmc_usic.c ****  *******************************************************************************/
+  56:../Libraries/XMCLib/src/xmc_usic.c **** 
+  57:../Libraries/XMCLib/src/xmc_usic.c **** #include "xmc_usic.h"
+  58:../Libraries/XMCLib/src/xmc_usic.c **** #include "xmc_scu.h"
+  59:../Libraries/XMCLib/src/xmc_usic.c **** 
+  60:../Libraries/XMCLib/src/xmc_usic.c **** /*******************************************************************************
+  61:../Libraries/XMCLib/src/xmc_usic.c ****  * MACROS
+  62:../Libraries/XMCLib/src/xmc_usic.c ****  *******************************************************************************/
+  63:../Libraries/XMCLib/src/xmc_usic.c **** 
+  64:../Libraries/XMCLib/src/xmc_usic.c **** #define USIC_CH_INPR_Msk       (0x7UL)
+  65:../Libraries/XMCLib/src/xmc_usic.c **** 
+  66:../Libraries/XMCLib/src/xmc_usic.c **** /*******************************************************************************
+  67:../Libraries/XMCLib/src/xmc_usic.c ****  * API IMPLEMENTATION
+  68:../Libraries/XMCLib/src/xmc_usic.c ****  *******************************************************************************/
+  69:../Libraries/XMCLib/src/xmc_usic.c **** 
+  70:../Libraries/XMCLib/src/xmc_usic.c **** void XMC_USIC_CH_Enable(XMC_USIC_CH_t *const channel)
+  71:../Libraries/XMCLib/src/xmc_usic.c **** {
+  26              	 .loc 1 71 0
+  27              	 .cfi_startproc
+  28 0000 80B5     	 push {r7,lr}
+  29              	.LCFI0:
+  30              	 .cfi_def_cfa_offset 8
+  31              	 .cfi_offset 7,-8
+  32              	 .cfi_offset 14,-4
+  33 0002 82B0     	 sub sp,sp,#8
+  34              	.LCFI1:
+  35              	 .cfi_def_cfa_offset 16
+  36 0004 00AF     	 add r7,sp,#0
+  37              	.LCFI2:
+  38              	 .cfi_def_cfa_register 7
+  39 0006 7860     	 str r0,[r7,#4]
+  72:../Libraries/XMCLib/src/xmc_usic.c ****   XMC_ASSERT("XMC_USIC_CH_Enable: channel not valid", XMC_USIC_CHECK_CH(channel));
+  73:../Libraries/XMCLib/src/xmc_usic.c ****   
+  74:../Libraries/XMCLib/src/xmc_usic.c ****   if ((channel == XMC_USIC0_CH0) || (channel == XMC_USIC0_CH1))
+  40              	 .loc 1 74 0
+  41 0008 7A68     	 ldr r2,[r7,#4]
+  42 000a 9023     	 mov r3,#144
+  43 000c DB05     	 lsl r3,r3,#23
+  44 000e 9A42     	 cmp r2,r3
+  45 0010 03D0     	 beq .L2
+  46              	 .loc 1 74 0 is_stmt 0 discriminator 1
+  47 0012 7B68     	 ldr r3,[r7,#4]
+  48 0014 0C4A     	 ldr r2,.L5
+  49 0016 9342     	 cmp r3,r2
+  50 0018 03D1     	 bne .L3
+  51              	.L2:
+  75:../Libraries/XMCLib/src/xmc_usic.c ****   {
+  76:../Libraries/XMCLib/src/xmc_usic.c ****     XMC_USIC_Enable(XMC_USIC0);
+  52              	 .loc 1 76 0 is_stmt 1
+  53 001a 0C4B     	 ldr r3,.L5+4
+  54 001c 181C     	 mov r0,r3
+  55 001e FFF7FEFF 	 bl XMC_USIC_Enable
+  56              	.L3:
+  77:../Libraries/XMCLib/src/xmc_usic.c ****   }
+  78:../Libraries/XMCLib/src/xmc_usic.c **** #if defined(USIC1)
+  79:../Libraries/XMCLib/src/xmc_usic.c ****   else if((channel == XMC_USIC1_CH0) || (channel == XMC_USIC1_CH1))
+  80:../Libraries/XMCLib/src/xmc_usic.c ****   {
+  81:../Libraries/XMCLib/src/xmc_usic.c ****     XMC_USIC_Enable(XMC_USIC1);
+  82:../Libraries/XMCLib/src/xmc_usic.c ****   }
+  83:../Libraries/XMCLib/src/xmc_usic.c **** #endif
+  84:../Libraries/XMCLib/src/xmc_usic.c **** #if defined(USIC2)
+  85:../Libraries/XMCLib/src/xmc_usic.c ****   else if((channel == XMC_USIC2_CH0) || (channel == XMC_USIC2_CH1))
+  86:../Libraries/XMCLib/src/xmc_usic.c ****   {
+  87:../Libraries/XMCLib/src/xmc_usic.c ****     XMC_USIC_Enable(XMC_USIC2);
+  88:../Libraries/XMCLib/src/xmc_usic.c ****   }
+  89:../Libraries/XMCLib/src/xmc_usic.c **** #endif
+  90:../Libraries/XMCLib/src/xmc_usic.c ****   else
+  91:../Libraries/XMCLib/src/xmc_usic.c ****   {
+  92:../Libraries/XMCLib/src/xmc_usic.c ****     XMC_ASSERT("USIC module not available", 0U/*Always*/);
+  93:../Libraries/XMCLib/src/xmc_usic.c ****   }
+  94:../Libraries/XMCLib/src/xmc_usic.c ****   /* USIC channel switched on*/
+  95:../Libraries/XMCLib/src/xmc_usic.c ****   channel->KSCFG = (USIC_CH_KSCFG_MODEN_Msk | USIC_CH_KSCFG_BPMODEN_Msk);
+  57              	 .loc 1 95 0
+  58 0022 7B68     	 ldr r3,[r7,#4]
+  59 0024 0322     	 mov r2,#3
+  60 0026 DA60     	 str r2,[r3,#12]
+  96:../Libraries/XMCLib/src/xmc_usic.c ****   while ((channel->KSCFG & USIC_CH_KSCFG_MODEN_Msk) == 0U)
+  61              	 .loc 1 96 0
+  62 0028 C046     	 mov r8,r8
+  63              	.L4:
+  64              	 .loc 1 96 0 is_stmt 0 discriminator 1
+  65 002a 7B68     	 ldr r3,[r7,#4]
+  66 002c DB68     	 ldr r3,[r3,#12]
+  67 002e 0122     	 mov r2,#1
+  68 0030 1340     	 and r3,r2
+  69 0032 FAD0     	 beq .L4
+  97:../Libraries/XMCLib/src/xmc_usic.c ****   {
+  98:../Libraries/XMCLib/src/xmc_usic.c ****     /* Wait till the channel is enabled */
+  99:../Libraries/XMCLib/src/xmc_usic.c ****   }
+ 100:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 101:../Libraries/XMCLib/src/xmc_usic.c ****   /* Set USIC channel in IDLE mode */
+ 102:../Libraries/XMCLib/src/xmc_usic.c ****   channel->CCR &= (uint32_t)~USIC_CH_CCR_MODE_Msk;
+  70              	 .loc 1 102 0 is_stmt 1
+  71 0034 7B68     	 ldr r3,[r7,#4]
+  72 0036 1B6C     	 ldr r3,[r3,#64]
+  73 0038 0F22     	 mov r2,#15
+  74 003a 9343     	 bic r3,r2
+  75 003c 1A1C     	 mov r2,r3
+  76 003e 7B68     	 ldr r3,[r7,#4]
+  77 0040 1A64     	 str r2,[r3,#64]
+ 103:../Libraries/XMCLib/src/xmc_usic.c **** }
+  78              	 .loc 1 103 0
+  79 0042 BD46     	 mov sp,r7
+  80 0044 02B0     	 add sp,sp,#8
+  81              	 
+  82 0046 80BD     	 pop {r7,pc}
+  83              	.L6:
+  84              	 .align 2
+  85              	.L5:
+  86 0048 00020048 	 .word 1207960064
+  87 004c 08000048 	 .word 1207959560
+  88              	 .cfi_endproc
+  89              	.LFE93:
+  91              	 .section .text.XMC_USIC_CH_Disable,"ax",%progbits
+  92              	 .align 2
+  93              	 .global XMC_USIC_CH_Disable
+  94              	 .code 16
+  95              	 .thumb_func
+  97              	XMC_USIC_CH_Disable:
+  98              	.LFB94:
+ 104:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 105:../Libraries/XMCLib/src/xmc_usic.c **** void XMC_USIC_CH_Disable(XMC_USIC_CH_t *const channel)
+ 106:../Libraries/XMCLib/src/xmc_usic.c **** {
+  99              	 .loc 1 106 0
+ 100              	 .cfi_startproc
+ 101 0000 80B5     	 push {r7,lr}
+ 102              	.LCFI3:
+ 103              	 .cfi_def_cfa_offset 8
+ 104              	 .cfi_offset 7,-8
+ 105              	 .cfi_offset 14,-4
+ 106 0002 82B0     	 sub sp,sp,#8
+ 107              	.LCFI4:
+ 108              	 .cfi_def_cfa_offset 16
+ 109 0004 00AF     	 add r7,sp,#0
+ 110              	.LCFI5:
+ 111              	 .cfi_def_cfa_register 7
+ 112 0006 7860     	 str r0,[r7,#4]
+ 107:../Libraries/XMCLib/src/xmc_usic.c ****   channel->KSCFG = (uint32_t)((channel->KSCFG & (~USIC_CH_KSCFG_MODEN_Msk)) | USIC_CH_KSCFG_BPMODEN
+ 113              	 .loc 1 107 0
+ 114 0008 7B68     	 ldr r3,[r7,#4]
+ 115 000a DB68     	 ldr r3,[r3,#12]
+ 116 000c 0322     	 mov r2,#3
+ 117 000e 9343     	 bic r3,r2
+ 118 0010 0222     	 mov r2,#2
+ 119 0012 1A43     	 orr r2,r3
+ 120 0014 7B68     	 ldr r3,[r7,#4]
+ 121 0016 DA60     	 str r2,[r3,#12]
+ 108:../Libraries/XMCLib/src/xmc_usic.c **** }
+ 122              	 .loc 1 108 0
+ 123 0018 BD46     	 mov sp,r7
+ 124 001a 02B0     	 add sp,sp,#8
+ 125              	 
+ 126 001c 80BD     	 pop {r7,pc}
+ 127              	 .cfi_endproc
+ 128              	.LFE94:
+ 130              	 .global __aeabi_uidiv
+ 131 001e C046     	 .section .text.XMC_USIC_CH_SetBaudrate,"ax",%progbits
+ 132              	 .align 2
+ 133              	 .global XMC_USIC_CH_SetBaudrate
+ 134              	 .code 16
+ 135              	 .thumb_func
+ 137              	XMC_USIC_CH_SetBaudrate:
+ 138              	.LFB95:
+ 109:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 110:../Libraries/XMCLib/src/xmc_usic.c **** XMC_USIC_CH_STATUS_t XMC_USIC_CH_SetBaudrate(XMC_USIC_CH_t *const channel, uint32_t rate, uint32_t 
+ 111:../Libraries/XMCLib/src/xmc_usic.c **** {
+ 139              	 .loc 1 111 0
+ 140              	 .cfi_startproc
+ 141 0000 80B5     	 push {r7,lr}
+ 142              	.LCFI6:
+ 143              	 .cfi_def_cfa_offset 8
+ 144              	 .cfi_offset 7,-8
+ 145              	 .cfi_offset 14,-4
+ 146 0002 8EB0     	 sub sp,sp,#56
+ 147              	.LCFI7:
+ 148              	 .cfi_def_cfa_offset 64
+ 149 0004 00AF     	 add r7,sp,#0
+ 150              	.LCFI8:
+ 151              	 .cfi_def_cfa_register 7
+ 152 0006 F860     	 str r0,[r7,#12]
+ 153 0008 B960     	 str r1,[r7,#8]
+ 154 000a 7A60     	 str r2,[r7,#4]
+ 112:../Libraries/XMCLib/src/xmc_usic.c ****   XMC_USIC_CH_STATUS_t status;
+ 113:../Libraries/XMCLib/src/xmc_usic.c ****   
+ 114:../Libraries/XMCLib/src/xmc_usic.c ****   uint32_t peripheral_clock;
+ 115:../Libraries/XMCLib/src/xmc_usic.c ****   
+ 116:../Libraries/XMCLib/src/xmc_usic.c ****   uint32_t clock_divider;
+ 117:../Libraries/XMCLib/src/xmc_usic.c ****   uint32_t clock_divider_min;
+ 118:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 119:../Libraries/XMCLib/src/xmc_usic.c ****   uint32_t pdiv;
+ 120:../Libraries/XMCLib/src/xmc_usic.c ****   uint32_t pdiv_int;
+ 121:../Libraries/XMCLib/src/xmc_usic.c ****   uint32_t pdiv_int_min;
+ 122:../Libraries/XMCLib/src/xmc_usic.c ****   
+ 123:../Libraries/XMCLib/src/xmc_usic.c ****   uint32_t pdiv_frac;
+ 124:../Libraries/XMCLib/src/xmc_usic.c ****   uint32_t pdiv_frac_min;
+ 125:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 126:../Libraries/XMCLib/src/xmc_usic.c ****   /* The rate and peripheral clock are divided by 100 to be able to use only 32bit arithmetic */
+ 127:../Libraries/XMCLib/src/xmc_usic.c ****   if ((rate >= 100U) && (oversampling != 0U))
+ 155              	 .loc 1 127 0
+ 156 000c BB68     	 ldr r3,[r7,#8]
+ 157 000e 632B     	 cmp r3,#99
+ 158 0010 5CD9     	 bls .L9
+ 159              	 .loc 1 127 0 is_stmt 0 discriminator 1
+ 160 0012 7B68     	 ldr r3,[r7,#4]
+ 161 0014 002B     	 cmp r3,#0
+ 162 0016 59D0     	 beq .L9
+ 128:../Libraries/XMCLib/src/xmc_usic.c ****   {
+ 129:../Libraries/XMCLib/src/xmc_usic.c ****     peripheral_clock = XMC_SCU_CLOCK_GetPeripheralClockFrequency() / 100U;
+ 163              	 .loc 1 129 0 is_stmt 1
+ 164 0018 FFF7FEFF 	 bl XMC_SCU_CLOCK_GetPeripheralClockFrequency
+ 165 001c 031C     	 mov r3,r0
+ 166 001e 181C     	 mov r0,r3
+ 167 0020 6421     	 mov r1,#100
+ 168 0022 FFF7FEFF 	 bl __aeabi_uidiv
+ 169 0026 031C     	 mov r3,r0
+ 170 0028 3B62     	 str r3,[r7,#32]
+ 130:../Libraries/XMCLib/src/xmc_usic.c ****     rate = rate / 100U;
+ 171              	 .loc 1 130 0
+ 172 002a BB68     	 ldr r3,[r7,#8]
+ 173 002c 181C     	 mov r0,r3
+ 174 002e 6421     	 mov r1,#100
+ 175 0030 FFF7FEFF 	 bl __aeabi_uidiv
+ 176 0034 031C     	 mov r3,r0
+ 177 0036 BB60     	 str r3,[r7,#8]
+ 131:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 132:../Libraries/XMCLib/src/xmc_usic.c ****     clock_divider_min = 1U;
+ 178              	 .loc 1 132 0
+ 179 0038 0123     	 mov r3,#1
+ 180 003a FB62     	 str r3,[r7,#44]
+ 133:../Libraries/XMCLib/src/xmc_usic.c ****     pdiv_int_min = 1U;
+ 181              	 .loc 1 133 0
+ 182 003c 0123     	 mov r3,#1
+ 183 003e BB62     	 str r3,[r7,#40]
+ 134:../Libraries/XMCLib/src/xmc_usic.c ****     pdiv_frac_min = 0x3ffU;
+ 184              	 .loc 1 134 0
+ 185 0040 284B     	 ldr r3,.L15
+ 186 0042 7B62     	 str r3,[r7,#36]
+ 135:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 136:../Libraries/XMCLib/src/xmc_usic.c ****     for(clock_divider = 1023U; clock_divider > 0U; --clock_divider)
+ 187              	 .loc 1 136 0
+ 188 0044 274B     	 ldr r3,.L15
+ 189 0046 3B63     	 str r3,[r7,#48]
+ 190 0048 24E0     	 b .L10
+ 191              	.L12:
+ 137:../Libraries/XMCLib/src/xmc_usic.c ****     {
+ 138:../Libraries/XMCLib/src/xmc_usic.c ****       pdiv = ((peripheral_clock * clock_divider) / (rate * oversampling));
+ 192              	 .loc 1 138 0
+ 193 004a 3B6A     	 ldr r3,[r7,#32]
+ 194 004c 3A6B     	 ldr r2,[r7,#48]
+ 195 004e 5A43     	 mul r2,r3
+ 196 0050 111C     	 mov r1,r2
+ 197 0052 BB68     	 ldr r3,[r7,#8]
+ 198 0054 7A68     	 ldr r2,[r7,#4]
+ 199 0056 5343     	 mul r3,r2
+ 200 0058 081C     	 mov r0,r1
+ 201 005a 191C     	 mov r1,r3
+ 202 005c FFF7FEFF 	 bl __aeabi_uidiv
+ 203 0060 031C     	 mov r3,r0
+ 204 0062 FB61     	 str r3,[r7,#28]
+ 139:../Libraries/XMCLib/src/xmc_usic.c ****       pdiv_int = pdiv >> 10U;
+ 205              	 .loc 1 139 0
+ 206 0064 FB69     	 ldr r3,[r7,#28]
+ 207 0066 9B0A     	 lsr r3,r3,#10
+ 208 0068 BB61     	 str r3,[r7,#24]
+ 140:../Libraries/XMCLib/src/xmc_usic.c ****       pdiv_frac = pdiv & 0x3ffU;
+ 209              	 .loc 1 140 0
+ 210 006a FB69     	 ldr r3,[r7,#28]
+ 211 006c 9B05     	 lsl r3,r3,#22
+ 212 006e 9B0D     	 lsr r3,r3,#22
+ 213 0070 7B61     	 str r3,[r7,#20]
+ 141:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 142:../Libraries/XMCLib/src/xmc_usic.c ****       if ((pdiv_int < 1024U) && (pdiv_frac < pdiv_frac_min))
+ 214              	 .loc 1 142 0
+ 215 0072 BB69     	 ldr r3,[r7,#24]
+ 216 0074 1B4A     	 ldr r2,.L15
+ 217 0076 9342     	 cmp r3,r2
+ 218 0078 09D8     	 bhi .L11
+ 219              	 .loc 1 142 0 is_stmt 0 discriminator 1
+ 220 007a 7A69     	 ldr r2,[r7,#20]
+ 221 007c 7B6A     	 ldr r3,[r7,#36]
+ 222 007e 9A42     	 cmp r2,r3
+ 223 0080 05D2     	 bcs .L11
+ 143:../Libraries/XMCLib/src/xmc_usic.c ****       {
+ 144:../Libraries/XMCLib/src/xmc_usic.c ****         pdiv_frac_min = pdiv_frac;
+ 224              	 .loc 1 144 0 is_stmt 1
+ 225 0082 7B69     	 ldr r3,[r7,#20]
+ 226 0084 7B62     	 str r3,[r7,#36]
+ 145:../Libraries/XMCLib/src/xmc_usic.c ****         pdiv_int_min = pdiv_int;
+ 227              	 .loc 1 145 0
+ 228 0086 BB69     	 ldr r3,[r7,#24]
+ 229 0088 BB62     	 str r3,[r7,#40]
+ 146:../Libraries/XMCLib/src/xmc_usic.c ****         clock_divider_min = clock_divider;
+ 230              	 .loc 1 146 0
+ 231 008a 3B6B     	 ldr r3,[r7,#48]
+ 232 008c FB62     	 str r3,[r7,#44]
+ 233              	.L11:
+ 136:../Libraries/XMCLib/src/xmc_usic.c ****     {
+ 234              	 .loc 1 136 0 discriminator 2
+ 235 008e 3B6B     	 ldr r3,[r7,#48]
+ 236 0090 013B     	 sub r3,r3,#1
+ 237 0092 3B63     	 str r3,[r7,#48]
+ 238              	.L10:
+ 136:../Libraries/XMCLib/src/xmc_usic.c ****     {
+ 239              	 .loc 1 136 0 is_stmt 0 discriminator 1
+ 240 0094 3B6B     	 ldr r3,[r7,#48]
+ 241 0096 002B     	 cmp r3,#0
+ 242 0098 D7D1     	 bne .L12
+ 147:../Libraries/XMCLib/src/xmc_usic.c ****       }
+ 148:../Libraries/XMCLib/src/xmc_usic.c ****     }
+ 149:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 150:../Libraries/XMCLib/src/xmc_usic.c ****     channel->FDR = XMC_USIC_CH_BRG_CLOCK_DIVIDER_MODE_FRACTIONAL |
+ 243              	 .loc 1 150 0 is_stmt 1
+ 244 009a FB6A     	 ldr r3,[r7,#44]
+ 245 009c 8022     	 mov r2,#128
+ 246 009e 1202     	 lsl r2,r2,#8
+ 247 00a0 1A43     	 orr r2,r3
+ 248 00a2 FB68     	 ldr r3,[r7,#12]
+ 249 00a4 1A61     	 str r2,[r3,#16]
+ 151:../Libraries/XMCLib/src/xmc_usic.c ****                    (clock_divider_min << USIC_CH_FDR_STEP_Pos);
+ 152:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 153:../Libraries/XMCLib/src/xmc_usic.c ****     channel->BRG = (channel->BRG & ~(USIC_CH_BRG_DCTQ_Msk |
+ 250              	 .loc 1 153 0
+ 251 00a6 FB68     	 ldr r3,[r7,#12]
+ 252 00a8 5B69     	 ldr r3,[r3,#20]
+ 253 00aa 0F4A     	 ldr r2,.L15+4
+ 254 00ac 1A40     	 and r2,r3
+ 154:../Libraries/XMCLib/src/xmc_usic.c ****                                      USIC_CH_BRG_PDIV_Msk |
+ 155:../Libraries/XMCLib/src/xmc_usic.c ****                                      USIC_CH_BRG_PCTQ_Msk |
+ 156:../Libraries/XMCLib/src/xmc_usic.c ****                                      USIC_CH_BRG_PPPEN_Msk)) |
+ 157:../Libraries/XMCLib/src/xmc_usic.c ****                    ((oversampling - 1U) << USIC_CH_BRG_DCTQ_Pos) |
+ 255              	 .loc 1 157 0
+ 256 00ae 7B68     	 ldr r3,[r7,#4]
+ 257 00b0 013B     	 sub r3,r3,#1
+ 258 00b2 9B02     	 lsl r3,r3,#10
+ 156:../Libraries/XMCLib/src/xmc_usic.c ****                    ((oversampling - 1U) << USIC_CH_BRG_DCTQ_Pos) |
+ 259              	 .loc 1 156 0
+ 260 00b4 1A43     	 orr r2,r3
+ 158:../Libraries/XMCLib/src/xmc_usic.c ****                    ((pdiv_int_min - 1U) << USIC_CH_BRG_PDIV_Pos);
+ 261              	 .loc 1 158 0
+ 262 00b6 BB6A     	 ldr r3,[r7,#40]
+ 263 00b8 013B     	 sub r3,r3,#1
+ 264 00ba 1B04     	 lsl r3,r3,#16
+ 157:../Libraries/XMCLib/src/xmc_usic.c ****                    ((pdiv_int_min - 1U) << USIC_CH_BRG_PDIV_Pos);
+ 265              	 .loc 1 157 0
+ 266 00bc 1A43     	 orr r2,r3
+ 153:../Libraries/XMCLib/src/xmc_usic.c ****                                      USIC_CH_BRG_PDIV_Msk |
+ 267              	 .loc 1 153 0
+ 268 00be FB68     	 ldr r3,[r7,#12]
+ 269 00c0 5A61     	 str r2,[r3,#20]
+ 159:../Libraries/XMCLib/src/xmc_usic.c ****                     
+ 160:../Libraries/XMCLib/src/xmc_usic.c ****     status = XMC_USIC_CH_STATUS_OK;
+ 270              	 .loc 1 160 0
+ 271 00c2 3723     	 mov r3,#55
+ 272 00c4 FB18     	 add r3,r7,r3
+ 273 00c6 0022     	 mov r2,#0
+ 274 00c8 1A70     	 strb r2,[r3]
+ 275 00ca 03E0     	 b .L13
+ 276              	.L9:
+ 161:../Libraries/XMCLib/src/xmc_usic.c ****   }
+ 162:../Libraries/XMCLib/src/xmc_usic.c ****   else 
+ 163:../Libraries/XMCLib/src/xmc_usic.c ****   {
+ 164:../Libraries/XMCLib/src/xmc_usic.c ****     status = XMC_USIC_CH_STATUS_ERROR;
+ 277              	 .loc 1 164 0
+ 278 00cc 3723     	 mov r3,#55
+ 279 00ce FB18     	 add r3,r7,r3
+ 280 00d0 0122     	 mov r2,#1
+ 281 00d2 1A70     	 strb r2,[r3]
+ 282              	.L13:
+ 165:../Libraries/XMCLib/src/xmc_usic.c ****   }
+ 166:../Libraries/XMCLib/src/xmc_usic.c ****   
+ 167:../Libraries/XMCLib/src/xmc_usic.c ****   return status;
+ 283              	 .loc 1 167 0
+ 284 00d4 3723     	 mov r3,#55
+ 285 00d6 FB18     	 add r3,r7,r3
+ 286 00d8 1B78     	 ldrb r3,[r3]
+ 168:../Libraries/XMCLib/src/xmc_usic.c **** }
+ 287              	 .loc 1 168 0
+ 288 00da 181C     	 mov r0,r3
+ 289 00dc BD46     	 mov sp,r7
+ 290 00de 0EB0     	 add sp,sp,#56
+ 291              	 
+ 292 00e0 80BD     	 pop {r7,pc}
+ 293              	.L16:
+ 294 00e2 C046     	 .align 2
+ 295              	.L15:
+ 296 00e4 FF030000 	 .word 1023
+ 297 00e8 EF8000FC 	 .word -67075857
+ 298              	 .cfi_endproc
+ 299              	.LFE95:
+ 301              	 .section .text.XMC_USIC_CH_TXFIFO_Configure,"ax",%progbits
+ 302              	 .align 2
+ 303              	 .global XMC_USIC_CH_TXFIFO_Configure
+ 304              	 .code 16
+ 305              	 .thumb_func
+ 307              	XMC_USIC_CH_TXFIFO_Configure:
+ 308              	.LFB96:
+ 169:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 170:../Libraries/XMCLib/src/xmc_usic.c **** void XMC_USIC_CH_TXFIFO_Configure(XMC_USIC_CH_t *const channel,
+ 171:../Libraries/XMCLib/src/xmc_usic.c ****                                   const uint32_t data_pointer,
+ 172:../Libraries/XMCLib/src/xmc_usic.c ****                                   const XMC_USIC_CH_FIFO_SIZE_t size,
+ 173:../Libraries/XMCLib/src/xmc_usic.c ****                                   const uint32_t limit)
+ 174:../Libraries/XMCLib/src/xmc_usic.c **** {
+ 309              	 .loc 1 174 0
+ 310              	 .cfi_startproc
+ 311 0000 80B5     	 push {r7,lr}
+ 312              	.LCFI9:
+ 313              	 .cfi_def_cfa_offset 8
+ 314              	 .cfi_offset 7,-8
+ 315              	 .cfi_offset 14,-4
+ 316 0002 84B0     	 sub sp,sp,#16
+ 317              	.LCFI10:
+ 318              	 .cfi_def_cfa_offset 24
+ 319 0004 00AF     	 add r7,sp,#0
+ 320              	.LCFI11:
+ 321              	 .cfi_def_cfa_register 7
+ 322 0006 F860     	 str r0,[r7,#12]
+ 323 0008 B960     	 str r1,[r7,#8]
+ 324 000a 3B60     	 str r3,[r7]
+ 325 000c FB1D     	 add r3,r7,#7
+ 326 000e 1A70     	 strb r2,[r3]
+ 175:../Libraries/XMCLib/src/xmc_usic.c ****   /* Disable FIFO */
+ 176:../Libraries/XMCLib/src/xmc_usic.c ****   channel->TBCTR &= (uint32_t)~USIC_CH_TBCTR_SIZE_Msk;
+ 327              	 .loc 1 176 0
+ 328 0010 FA68     	 ldr r2,[r7,#12]
+ 329 0012 8423     	 mov r3,#132
+ 330 0014 5B00     	 lsl r3,r3,#1
+ 331 0016 D358     	 ldr r3,[r2,r3]
+ 332 0018 0E4A     	 ldr r2,.L18
+ 333 001a 1340     	 and r3,r2
+ 334 001c 191C     	 mov r1,r3
+ 335 001e FA68     	 ldr r2,[r7,#12]
+ 336 0020 8423     	 mov r3,#132
+ 337 0022 5B00     	 lsl r3,r3,#1
+ 338 0024 D150     	 str r1,[r2,r3]
+ 177:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 178:../Libraries/XMCLib/src/xmc_usic.c ****   /* LOF = 0, A standard transmit buffer event occurs when the filling level equals the limit value
+ 179:../Libraries/XMCLib/src/xmc_usic.c ****    * lower due to transmission of a data word
+ 180:../Libraries/XMCLib/src/xmc_usic.c ****    * STBTEN = 0, the trigger of the standard transmit buffer event is based on the transition of th
+ 181:../Libraries/XMCLib/src/xmc_usic.c ****    *  from equal to below the limit, not the fact being below
+ 182:../Libraries/XMCLib/src/xmc_usic.c ****    */
+ 183:../Libraries/XMCLib/src/xmc_usic.c ****   channel->TBCTR = (uint32_t)(channel->TBCTR & (uint32_t)~(USIC_CH_TBCTR_LIMIT_Msk |
+ 339              	 .loc 1 183 0
+ 340 0026 FA68     	 ldr r2,[r7,#12]
+ 341 0028 8423     	 mov r3,#132
+ 342 002a 5B00     	 lsl r3,r3,#1
+ 343 002c D358     	 ldr r3,[r2,r3]
+ 344 002e 0A4A     	 ldr r2,.L18+4
+ 345 0030 1A40     	 and r2,r3
+ 184:../Libraries/XMCLib/src/xmc_usic.c ****                                                            USIC_CH_TBCTR_DPTR_Msk |
+ 185:../Libraries/XMCLib/src/xmc_usic.c ****                                                            USIC_CH_TBCTR_SIZE_Msk)) |
+ 186:../Libraries/XMCLib/src/xmc_usic.c ****                    (uint32_t)((limit << USIC_CH_TBCTR_LIMIT_Pos) |
+ 346              	 .loc 1 186 0
+ 347 0032 3B68     	 ldr r3,[r7]
+ 348 0034 1902     	 lsl r1,r3,#8
+ 349 0036 BB68     	 ldr r3,[r7,#8]
+ 350 0038 1943     	 orr r1,r3
+ 187:../Libraries/XMCLib/src/xmc_usic.c ****                    (data_pointer << USIC_CH_TBCTR_DPTR_Pos) |
+ 188:../Libraries/XMCLib/src/xmc_usic.c ****                    ((uint32_t)size << USIC_CH_TBCTR_SIZE_Pos));
+ 351              	 .loc 1 188 0
+ 352 003a FB1D     	 add r3,r7,#7
+ 353 003c 1B78     	 ldrb r3,[r3]
+ 354 003e 1B06     	 lsl r3,r3,#24
+ 186:../Libraries/XMCLib/src/xmc_usic.c ****                    (data_pointer << USIC_CH_TBCTR_DPTR_Pos) |
+ 355              	 .loc 1 186 0
+ 356 0040 0B43     	 orr r3,r1
+ 185:../Libraries/XMCLib/src/xmc_usic.c ****                    (uint32_t)((limit << USIC_CH_TBCTR_LIMIT_Pos) |
+ 357              	 .loc 1 185 0
+ 358 0042 1A43     	 orr r2,r3
+ 359 0044 111C     	 mov r1,r2
+ 183:../Libraries/XMCLib/src/xmc_usic.c ****                                                            USIC_CH_TBCTR_DPTR_Msk |
+ 360              	 .loc 1 183 0
+ 361 0046 FA68     	 ldr r2,[r7,#12]
+ 362 0048 8423     	 mov r3,#132
+ 363 004a 5B00     	 lsl r3,r3,#1
+ 364 004c D150     	 str r1,[r2,r3]
+ 189:../Libraries/XMCLib/src/xmc_usic.c **** }
+ 365              	 .loc 1 189 0
+ 366 004e BD46     	 mov sp,r7
+ 367 0050 04B0     	 add sp,sp,#16
+ 368              	 
+ 369 0052 80BD     	 pop {r7,pc}
+ 370              	.L19:
+ 371              	 .align 2
+ 372              	.L18:
+ 373 0054 FFFFFFF8 	 .word -117440513
+ 374 0058 C0C0FFF8 	 .word -117456704
+ 375              	 .cfi_endproc
+ 376              	.LFE96:
+ 378              	 .section .text.XMC_USIC_CH_RXFIFO_Configure,"ax",%progbits
+ 379              	 .align 2
+ 380              	 .global XMC_USIC_CH_RXFIFO_Configure
+ 381              	 .code 16
+ 382              	 .thumb_func
+ 384              	XMC_USIC_CH_RXFIFO_Configure:
+ 385              	.LFB97:
+ 190:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 191:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 192:../Libraries/XMCLib/src/xmc_usic.c **** void XMC_USIC_CH_RXFIFO_Configure(XMC_USIC_CH_t *const channel,
+ 193:../Libraries/XMCLib/src/xmc_usic.c ****                                   const uint32_t data_pointer,
+ 194:../Libraries/XMCLib/src/xmc_usic.c ****                                   const XMC_USIC_CH_FIFO_SIZE_t size,
+ 195:../Libraries/XMCLib/src/xmc_usic.c ****                                   const uint32_t limit)
+ 196:../Libraries/XMCLib/src/xmc_usic.c **** {
+ 386              	 .loc 1 196 0
+ 387              	 .cfi_startproc
+ 388 0000 80B5     	 push {r7,lr}
+ 389              	.LCFI12:
+ 390              	 .cfi_def_cfa_offset 8
+ 391              	 .cfi_offset 7,-8
+ 392              	 .cfi_offset 14,-4
+ 393 0002 84B0     	 sub sp,sp,#16
+ 394              	.LCFI13:
+ 395              	 .cfi_def_cfa_offset 24
+ 396 0004 00AF     	 add r7,sp,#0
+ 397              	.LCFI14:
+ 398              	 .cfi_def_cfa_register 7
+ 399 0006 F860     	 str r0,[r7,#12]
+ 400 0008 B960     	 str r1,[r7,#8]
+ 401 000a 3B60     	 str r3,[r7]
+ 402 000c FB1D     	 add r3,r7,#7
+ 403 000e 1A70     	 strb r2,[r3]
+ 197:../Libraries/XMCLib/src/xmc_usic.c ****   /* Disable FIFO */
+ 198:../Libraries/XMCLib/src/xmc_usic.c ****   channel->RBCTR &= (uint32_t)~USIC_CH_RBCTR_SIZE_Msk;
+ 404              	 .loc 1 198 0
+ 405 0010 FA68     	 ldr r2,[r7,#12]
+ 406 0012 8623     	 mov r3,#134
+ 407 0014 5B00     	 lsl r3,r3,#1
+ 408 0016 D358     	 ldr r3,[r2,r3]
+ 409 0018 104A     	 ldr r2,.L21
+ 410 001a 1340     	 and r3,r2
+ 411 001c 191C     	 mov r1,r3
+ 412 001e FA68     	 ldr r2,[r7,#12]
+ 413 0020 8623     	 mov r3,#134
+ 414 0022 5B00     	 lsl r3,r3,#1
+ 415 0024 D150     	 str r1,[r2,r3]
+ 199:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 200:../Libraries/XMCLib/src/xmc_usic.c ****   /* LOF = 1, A standard receive buffer event occurs when the filling level equals the limit value 
+ 201:../Libraries/XMCLib/src/xmc_usic.c ****    *  due to the reception of a new data word
+ 202:../Libraries/XMCLib/src/xmc_usic.c ****    */
+ 203:../Libraries/XMCLib/src/xmc_usic.c ****   channel->RBCTR = (uint32_t)((channel->RBCTR & (uint32_t)~(USIC_CH_RBCTR_LIMIT_Msk |
+ 416              	 .loc 1 203 0
+ 417 0026 FA68     	 ldr r2,[r7,#12]
+ 418 0028 8623     	 mov r3,#134
+ 419 002a 5B00     	 lsl r3,r3,#1
+ 420 002c D358     	 ldr r3,[r2,r3]
+ 421 002e 0C4A     	 ldr r2,.L21+4
+ 422 0030 1A40     	 and r2,r3
+ 204:../Libraries/XMCLib/src/xmc_usic.c ****                                                             USIC_CH_RBCTR_DPTR_Msk |
+ 205:../Libraries/XMCLib/src/xmc_usic.c ****                                                             USIC_CH_RBCTR_LOF_Msk)) |
+ 206:../Libraries/XMCLib/src/xmc_usic.c ****                    ((limit << USIC_CH_RBCTR_LIMIT_Pos) |
+ 423              	 .loc 1 206 0
+ 424 0032 3B68     	 ldr r3,[r7]
+ 425 0034 1902     	 lsl r1,r3,#8
+ 426 0036 BB68     	 ldr r3,[r7,#8]
+ 427 0038 1943     	 orr r1,r3
+ 207:../Libraries/XMCLib/src/xmc_usic.c ****                    (data_pointer << USIC_CH_RBCTR_DPTR_Pos) |
+ 208:../Libraries/XMCLib/src/xmc_usic.c ****                    ((uint32_t)size << USIC_CH_RBCTR_SIZE_Pos) |
+ 428              	 .loc 1 208 0
+ 429 003a FB1D     	 add r3,r7,#7
+ 430 003c 1B78     	 ldrb r3,[r3]
+ 431 003e 1B06     	 lsl r3,r3,#24
+ 207:../Libraries/XMCLib/src/xmc_usic.c ****                    (data_pointer << USIC_CH_RBCTR_DPTR_Pos) |
+ 432              	 .loc 1 207 0
+ 433 0040 0B43     	 orr r3,r1
+ 203:../Libraries/XMCLib/src/xmc_usic.c ****                                                             USIC_CH_RBCTR_DPTR_Msk |
+ 434              	 .loc 1 203 0
+ 435 0042 1343     	 orr r3,r2
+ 436 0044 8022     	 mov r2,#128
+ 437 0046 5205     	 lsl r2,r2,#21
+ 438 0048 1A43     	 orr r2,r3
+ 439 004a 111C     	 mov r1,r2
+ 440 004c FA68     	 ldr r2,[r7,#12]
+ 441 004e 8623     	 mov r3,#134
+ 442 0050 5B00     	 lsl r3,r3,#1
+ 443 0052 D150     	 str r1,[r2,r3]
+ 209:../Libraries/XMCLib/src/xmc_usic.c ****                    (uint32_t)USIC_CH_RBCTR_LOF_Msk));
+ 210:../Libraries/XMCLib/src/xmc_usic.c **** }
+ 444              	 .loc 1 210 0
+ 445 0054 BD46     	 mov sp,r7
+ 446 0056 04B0     	 add sp,sp,#16
+ 447              	 
+ 448 0058 80BD     	 pop {r7,pc}
+ 449              	.L22:
+ 450 005a C046     	 .align 2
+ 451              	.L21:
+ 452 005c FFFFFFF8 	 .word -117440513
+ 453 0060 C0C0FFEF 	 .word -268451648
+ 454              	 .cfi_endproc
+ 455              	.LFE97:
+ 457              	 .section .text.XMC_USIC_CH_TXFIFO_SetSizeTriggerLimit,"ax",%progbits
+ 458              	 .align 2
+ 459              	 .global XMC_USIC_CH_TXFIFO_SetSizeTriggerLimit
+ 460              	 .code 16
+ 461              	 .thumb_func
+ 463              	XMC_USIC_CH_TXFIFO_SetSizeTriggerLimit:
+ 464              	.LFB98:
+ 211:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 212:../Libraries/XMCLib/src/xmc_usic.c **** void XMC_USIC_CH_TXFIFO_SetSizeTriggerLimit(XMC_USIC_CH_t *const channel,
+ 213:../Libraries/XMCLib/src/xmc_usic.c ****                                             const XMC_USIC_CH_FIFO_SIZE_t size,
+ 214:../Libraries/XMCLib/src/xmc_usic.c ****                                             const uint32_t limit)
+ 215:../Libraries/XMCLib/src/xmc_usic.c **** {
+ 465              	 .loc 1 215 0
+ 466              	 .cfi_startproc
+ 467 0000 80B5     	 push {r7,lr}
+ 468              	.LCFI15:
+ 469              	 .cfi_def_cfa_offset 8
+ 470              	 .cfi_offset 7,-8
+ 471              	 .cfi_offset 14,-4
+ 472 0002 84B0     	 sub sp,sp,#16
+ 473              	.LCFI16:
+ 474              	 .cfi_def_cfa_offset 24
+ 475 0004 00AF     	 add r7,sp,#0
+ 476              	.LCFI17:
+ 477              	 .cfi_def_cfa_register 7
+ 478 0006 F860     	 str r0,[r7,#12]
+ 479 0008 7A60     	 str r2,[r7,#4]
+ 480 000a 0B23     	 mov r3,#11
+ 481 000c FB18     	 add r3,r7,r3
+ 482 000e 0A1C     	 add r2,r1,#0
+ 483 0010 1A70     	 strb r2,[r3]
+ 216:../Libraries/XMCLib/src/xmc_usic.c ****   /* Disable FIFO */
+ 217:../Libraries/XMCLib/src/xmc_usic.c ****   channel->TBCTR &= (uint32_t)~USIC_CH_TBCTR_SIZE_Msk;
+ 484              	 .loc 1 217 0
+ 485 0012 FA68     	 ldr r2,[r7,#12]
+ 486 0014 8423     	 mov r3,#132
+ 487 0016 5B00     	 lsl r3,r3,#1
+ 488 0018 D358     	 ldr r3,[r2,r3]
+ 489 001a 0E4A     	 ldr r2,.L24
+ 490 001c 1340     	 and r3,r2
+ 491 001e 191C     	 mov r1,r3
+ 492 0020 FA68     	 ldr r2,[r7,#12]
+ 493 0022 8423     	 mov r3,#132
+ 494 0024 5B00     	 lsl r3,r3,#1
+ 495 0026 D150     	 str r1,[r2,r3]
+ 218:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 219:../Libraries/XMCLib/src/xmc_usic.c ****   /* STBTEN = 0, the trigger of the standard transmit buffer event is based on the transition of th
+ 220:../Libraries/XMCLib/src/xmc_usic.c ****    *  from equal to below the limit, not the fact being below
+ 221:../Libraries/XMCLib/src/xmc_usic.c ****    */
+ 222:../Libraries/XMCLib/src/xmc_usic.c ****   channel->TBCTR = (uint32_t)((uint32_t)(channel->TBCTR & (uint32_t)~USIC_CH_TBCTR_LIMIT_Msk) |
+ 496              	 .loc 1 222 0
+ 497 0028 FA68     	 ldr r2,[r7,#12]
+ 498 002a 8423     	 mov r3,#132
+ 499 002c 5B00     	 lsl r3,r3,#1
+ 500 002e D358     	 ldr r3,[r2,r3]
+ 501 0030 094A     	 ldr r2,.L24+4
+ 502 0032 1A40     	 and r2,r3
+ 223:../Libraries/XMCLib/src/xmc_usic.c ****                    (limit << USIC_CH_TBCTR_LIMIT_Pos) |
+ 503              	 .loc 1 223 0
+ 504 0034 7B68     	 ldr r3,[r7,#4]
+ 505 0036 1B02     	 lsl r3,r3,#8
+ 222:../Libraries/XMCLib/src/xmc_usic.c ****                    (limit << USIC_CH_TBCTR_LIMIT_Pos) |
+ 506              	 .loc 1 222 0
+ 507 0038 1A43     	 orr r2,r3
+ 224:../Libraries/XMCLib/src/xmc_usic.c ****                    ((uint32_t)size << USIC_CH_TBCTR_SIZE_Pos));
+ 508              	 .loc 1 224 0
+ 509 003a 0B23     	 mov r3,#11
+ 510 003c FB18     	 add r3,r7,r3
+ 511 003e 1B78     	 ldrb r3,[r3]
+ 512 0040 1B06     	 lsl r3,r3,#24
+ 222:../Libraries/XMCLib/src/xmc_usic.c ****                    (limit << USIC_CH_TBCTR_LIMIT_Pos) |
+ 513              	 .loc 1 222 0
+ 514 0042 1A43     	 orr r2,r3
+ 515 0044 111C     	 mov r1,r2
+ 516 0046 FA68     	 ldr r2,[r7,#12]
+ 517 0048 8423     	 mov r3,#132
+ 518 004a 5B00     	 lsl r3,r3,#1
+ 519 004c D150     	 str r1,[r2,r3]
+ 225:../Libraries/XMCLib/src/xmc_usic.c **** }
+ 520              	 .loc 1 225 0
+ 521 004e BD46     	 mov sp,r7
+ 522 0050 04B0     	 add sp,sp,#16
+ 523              	 
+ 524 0052 80BD     	 pop {r7,pc}
+ 525              	.L25:
+ 526              	 .align 2
+ 527              	.L24:
+ 528 0054 FFFFFFF8 	 .word -117440513
+ 529 0058 FFC0FFFF 	 .word -16129
+ 530              	 .cfi_endproc
+ 531              	.LFE98:
+ 533              	 .section .text.XMC_USIC_CH_RXFIFO_SetSizeTriggerLimit,"ax",%progbits
+ 534              	 .align 2
+ 535              	 .global XMC_USIC_CH_RXFIFO_SetSizeTriggerLimit
+ 536              	 .code 16
+ 537              	 .thumb_func
+ 539              	XMC_USIC_CH_RXFIFO_SetSizeTriggerLimit:
+ 540              	.LFB99:
+ 226:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 227:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 228:../Libraries/XMCLib/src/xmc_usic.c **** void XMC_USIC_CH_RXFIFO_SetSizeTriggerLimit(XMC_USIC_CH_t *const channel,
+ 229:../Libraries/XMCLib/src/xmc_usic.c ****                                             const XMC_USIC_CH_FIFO_SIZE_t size,
+ 230:../Libraries/XMCLib/src/xmc_usic.c ****                                             const uint32_t limit)
+ 231:../Libraries/XMCLib/src/xmc_usic.c **** {
+ 541              	 .loc 1 231 0
+ 542              	 .cfi_startproc
+ 543 0000 80B5     	 push {r7,lr}
+ 544              	.LCFI18:
+ 545              	 .cfi_def_cfa_offset 8
+ 546              	 .cfi_offset 7,-8
+ 547              	 .cfi_offset 14,-4
+ 548 0002 84B0     	 sub sp,sp,#16
+ 549              	.LCFI19:
+ 550              	 .cfi_def_cfa_offset 24
+ 551 0004 00AF     	 add r7,sp,#0
+ 552              	.LCFI20:
+ 553              	 .cfi_def_cfa_register 7
+ 554 0006 F860     	 str r0,[r7,#12]
+ 555 0008 7A60     	 str r2,[r7,#4]
+ 556 000a 0B23     	 mov r3,#11
+ 557 000c FB18     	 add r3,r7,r3
+ 558 000e 0A1C     	 add r2,r1,#0
+ 559 0010 1A70     	 strb r2,[r3]
+ 232:../Libraries/XMCLib/src/xmc_usic.c ****   /* Disable FIFO */
+ 233:../Libraries/XMCLib/src/xmc_usic.c ****   channel->RBCTR &= (uint32_t)~USIC_CH_RBCTR_SIZE_Msk;
+ 560              	 .loc 1 233 0
+ 561 0012 FA68     	 ldr r2,[r7,#12]
+ 562 0014 8623     	 mov r3,#134
+ 563 0016 5B00     	 lsl r3,r3,#1
+ 564 0018 D358     	 ldr r3,[r2,r3]
+ 565 001a 0E4A     	 ldr r2,.L27
+ 566 001c 1340     	 and r3,r2
+ 567 001e 191C     	 mov r1,r3
+ 568 0020 FA68     	 ldr r2,[r7,#12]
+ 569 0022 8623     	 mov r3,#134
+ 570 0024 5B00     	 lsl r3,r3,#1
+ 571 0026 D150     	 str r1,[r2,r3]
+ 234:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 235:../Libraries/XMCLib/src/xmc_usic.c ****   channel->RBCTR = (uint32_t)((uint32_t)(channel->RBCTR & (uint32_t)~USIC_CH_RBCTR_LIMIT_Msk) |
+ 572              	 .loc 1 235 0
+ 573 0028 FA68     	 ldr r2,[r7,#12]
+ 574 002a 8623     	 mov r3,#134
+ 575 002c 5B00     	 lsl r3,r3,#1
+ 576 002e D358     	 ldr r3,[r2,r3]
+ 577 0030 094A     	 ldr r2,.L27+4
+ 578 0032 1A40     	 and r2,r3
+ 236:../Libraries/XMCLib/src/xmc_usic.c ****                    (limit << USIC_CH_RBCTR_LIMIT_Pos) |
+ 579              	 .loc 1 236 0
+ 580 0034 7B68     	 ldr r3,[r7,#4]
+ 581 0036 1B02     	 lsl r3,r3,#8
+ 235:../Libraries/XMCLib/src/xmc_usic.c ****                    (limit << USIC_CH_RBCTR_LIMIT_Pos) |
+ 582              	 .loc 1 235 0
+ 583 0038 1A43     	 orr r2,r3
+ 237:../Libraries/XMCLib/src/xmc_usic.c ****                    ((uint32_t)size << USIC_CH_RBCTR_SIZE_Pos));
+ 584              	 .loc 1 237 0
+ 585 003a 0B23     	 mov r3,#11
+ 586 003c FB18     	 add r3,r7,r3
+ 587 003e 1B78     	 ldrb r3,[r3]
+ 588 0040 1B06     	 lsl r3,r3,#24
+ 235:../Libraries/XMCLib/src/xmc_usic.c ****                    (limit << USIC_CH_RBCTR_LIMIT_Pos) |
+ 589              	 .loc 1 235 0
+ 590 0042 1A43     	 orr r2,r3
+ 591 0044 111C     	 mov r1,r2
+ 592 0046 FA68     	 ldr r2,[r7,#12]
+ 593 0048 8623     	 mov r3,#134
+ 594 004a 5B00     	 lsl r3,r3,#1
+ 595 004c D150     	 str r1,[r2,r3]
+ 238:../Libraries/XMCLib/src/xmc_usic.c **** }
+ 596              	 .loc 1 238 0
+ 597 004e BD46     	 mov sp,r7
+ 598 0050 04B0     	 add sp,sp,#16
+ 599              	 
+ 600 0052 80BD     	 pop {r7,pc}
+ 601              	.L28:
+ 602              	 .align 2
+ 603              	.L27:
+ 604 0054 FFFFFFF8 	 .word -117440513
+ 605 0058 FFC0FFFF 	 .word -16129
+ 606              	 .cfi_endproc
+ 607              	.LFE99:
+ 609              	 .section .text.XMC_USIC_CH_SetInterruptNodePointer,"ax",%progbits
+ 610              	 .align 2
+ 611              	 .global XMC_USIC_CH_SetInterruptNodePointer
+ 612              	 .code 16
+ 613              	 .thumb_func
+ 615              	XMC_USIC_CH_SetInterruptNodePointer:
+ 616              	.LFB100:
+ 239:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 240:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 241:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 242:../Libraries/XMCLib/src/xmc_usic.c **** void XMC_USIC_CH_SetInterruptNodePointer(XMC_USIC_CH_t *const channel,
+ 243:../Libraries/XMCLib/src/xmc_usic.c ****                                          const XMC_USIC_CH_INTERRUPT_NODE_POINTER_t interrupt_node,
+ 244:../Libraries/XMCLib/src/xmc_usic.c ****                                          const uint32_t service_request)
+ 245:../Libraries/XMCLib/src/xmc_usic.c **** {
+ 617              	 .loc 1 245 0
+ 618              	 .cfi_startproc
+ 619 0000 80B5     	 push {r7,lr}
+ 620              	.LCFI21:
+ 621              	 .cfi_def_cfa_offset 8
+ 622              	 .cfi_offset 7,-8
+ 623              	 .cfi_offset 14,-4
+ 624 0002 84B0     	 sub sp,sp,#16
+ 625              	.LCFI22:
+ 626              	 .cfi_def_cfa_offset 24
+ 627 0004 00AF     	 add r7,sp,#0
+ 628              	.LCFI23:
+ 629              	 .cfi_def_cfa_register 7
+ 630 0006 F860     	 str r0,[r7,#12]
+ 631 0008 7A60     	 str r2,[r7,#4]
+ 632 000a 0B23     	 mov r3,#11
+ 633 000c FB18     	 add r3,r7,r3
+ 634 000e 0A1C     	 add r2,r1,#0
+ 635 0010 1A70     	 strb r2,[r3]
+ 246:../Libraries/XMCLib/src/xmc_usic.c ****   channel->INPR = (uint32_t)((channel->INPR & (~(uint32_t)(USIC_CH_INPR_Msk << (uint32_t)interrupt_
+ 636              	 .loc 1 246 0
+ 637 0012 FB68     	 ldr r3,[r7,#12]
+ 638 0014 9B69     	 ldr r3,[r3,#24]
+ 639 0016 0B22     	 mov r2,#11
+ 640 0018 BA18     	 add r2,r7,r2
+ 641 001a 1278     	 ldrb r2,[r2]
+ 642 001c 0721     	 mov r1,#7
+ 643 001e 9140     	 lsl r1,r1,r2
+ 644 0020 0A1C     	 mov r2,r1
+ 645 0022 D243     	 mvn r2,r2
+ 646 0024 1A40     	 and r2,r3
+ 247:../Libraries/XMCLib/src/xmc_usic.c ****                   (service_request << (uint32_t)interrupt_node));
+ 647              	 .loc 1 247 0
+ 648 0026 0B23     	 mov r3,#11
+ 649 0028 FB18     	 add r3,r7,r3
+ 650 002a 1B78     	 ldrb r3,[r3]
+ 651 002c 7968     	 ldr r1,[r7,#4]
+ 652 002e 9940     	 lsl r1,r1,r3
+ 653 0030 0B1C     	 mov r3,r1
+ 246:../Libraries/XMCLib/src/xmc_usic.c ****   channel->INPR = (uint32_t)((channel->INPR & (~(uint32_t)(USIC_CH_INPR_Msk << (uint32_t)interrupt_
+ 654              	 .loc 1 246 0
+ 655 0032 1A43     	 orr r2,r3
+ 656 0034 FB68     	 ldr r3,[r7,#12]
+ 657 0036 9A61     	 str r2,[r3,#24]
+ 248:../Libraries/XMCLib/src/xmc_usic.c **** }
+ 658              	 .loc 1 248 0
+ 659 0038 BD46     	 mov sp,r7
+ 660 003a 04B0     	 add sp,sp,#16
+ 661              	 
+ 662 003c 80BD     	 pop {r7,pc}
+ 663              	 .cfi_endproc
+ 664              	.LFE100:
+ 666 003e C046     	 .section .text.XMC_USIC_CH_TXFIFO_SetInterruptNodePointer,"ax",%progbits
+ 667              	 .align 2
+ 668              	 .global XMC_USIC_CH_TXFIFO_SetInterruptNodePointer
+ 669              	 .code 16
+ 670              	 .thumb_func
+ 672              	XMC_USIC_CH_TXFIFO_SetInterruptNodePointer:
+ 673              	.LFB101:
+ 249:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 250:../Libraries/XMCLib/src/xmc_usic.c **** void XMC_USIC_CH_TXFIFO_SetInterruptNodePointer(XMC_USIC_CH_t *const channel,
+ 251:../Libraries/XMCLib/src/xmc_usic.c ****                                                 const XMC_USIC_CH_TXFIFO_INTERRUPT_NODE_POINTER_t i
+ 252:../Libraries/XMCLib/src/xmc_usic.c ****                                                 const uint32_t service_request)
+ 253:../Libraries/XMCLib/src/xmc_usic.c **** {
+ 674              	 .loc 1 253 0
+ 675              	 .cfi_startproc
+ 676 0000 80B5     	 push {r7,lr}
+ 677              	.LCFI24:
+ 678              	 .cfi_def_cfa_offset 8
+ 679              	 .cfi_offset 7,-8
+ 680              	 .cfi_offset 14,-4
+ 681 0002 84B0     	 sub sp,sp,#16
+ 682              	.LCFI25:
+ 683              	 .cfi_def_cfa_offset 24
+ 684 0004 00AF     	 add r7,sp,#0
+ 685              	.LCFI26:
+ 686              	 .cfi_def_cfa_register 7
+ 687 0006 F860     	 str r0,[r7,#12]
+ 688 0008 7A60     	 str r2,[r7,#4]
+ 689 000a 0B23     	 mov r3,#11
+ 690 000c FB18     	 add r3,r7,r3
+ 691 000e 0A1C     	 add r2,r1,#0
+ 692 0010 1A70     	 strb r2,[r3]
+ 254:../Libraries/XMCLib/src/xmc_usic.c ****   channel->TBCTR = (uint32_t)((channel->TBCTR & (~(uint32_t)(USIC_CH_INPR_Msk << (uint32_t)interrup
+ 693              	 .loc 1 254 0
+ 694 0012 FA68     	 ldr r2,[r7,#12]
+ 695 0014 8423     	 mov r3,#132
+ 696 0016 5B00     	 lsl r3,r3,#1
+ 697 0018 D358     	 ldr r3,[r2,r3]
+ 698 001a 0B22     	 mov r2,#11
+ 699 001c BA18     	 add r2,r7,r2
+ 700 001e 1278     	 ldrb r2,[r2]
+ 701 0020 0721     	 mov r1,#7
+ 702 0022 9140     	 lsl r1,r1,r2
+ 703 0024 0A1C     	 mov r2,r1
+ 704 0026 D243     	 mvn r2,r2
+ 705 0028 1A40     	 and r2,r3
+ 255:../Libraries/XMCLib/src/xmc_usic.c ****                    (service_request << (uint32_t)interrupt_node));
+ 706              	 .loc 1 255 0
+ 707 002a 0B23     	 mov r3,#11
+ 708 002c FB18     	 add r3,r7,r3
+ 709 002e 1B78     	 ldrb r3,[r3]
+ 710 0030 7968     	 ldr r1,[r7,#4]
+ 711 0032 9940     	 lsl r1,r1,r3
+ 712 0034 0B1C     	 mov r3,r1
+ 254:../Libraries/XMCLib/src/xmc_usic.c ****   channel->TBCTR = (uint32_t)((channel->TBCTR & (~(uint32_t)(USIC_CH_INPR_Msk << (uint32_t)interrup
+ 713              	 .loc 1 254 0
+ 714 0036 1A43     	 orr r2,r3
+ 715 0038 111C     	 mov r1,r2
+ 716 003a FA68     	 ldr r2,[r7,#12]
+ 717 003c 8423     	 mov r3,#132
+ 718 003e 5B00     	 lsl r3,r3,#1
+ 719 0040 D150     	 str r1,[r2,r3]
+ 256:../Libraries/XMCLib/src/xmc_usic.c **** }
+ 720              	 .loc 1 256 0
+ 721 0042 BD46     	 mov sp,r7
+ 722 0044 04B0     	 add sp,sp,#16
+ 723              	 
+ 724 0046 80BD     	 pop {r7,pc}
+ 725              	 .cfi_endproc
+ 726              	.LFE101:
+ 728              	 .section .text.XMC_USIC_CH_RXFIFO_SetInterruptNodePointer,"ax",%progbits
+ 729              	 .align 2
+ 730              	 .global XMC_USIC_CH_RXFIFO_SetInterruptNodePointer
+ 731              	 .code 16
+ 732              	 .thumb_func
+ 734              	XMC_USIC_CH_RXFIFO_SetInterruptNodePointer:
+ 735              	.LFB102:
+ 257:../Libraries/XMCLib/src/xmc_usic.c **** 
+ 258:../Libraries/XMCLib/src/xmc_usic.c **** void XMC_USIC_CH_RXFIFO_SetInterruptNodePointer(XMC_USIC_CH_t *const channel,
+ 259:../Libraries/XMCLib/src/xmc_usic.c ****                                                 const XMC_USIC_CH_RXFIFO_INTERRUPT_NODE_POINTER_t i
+ 260:../Libraries/XMCLib/src/xmc_usic.c ****                                                 const uint32_t service_request)
+ 261:../Libraries/XMCLib/src/xmc_usic.c **** {
+ 736              	 .loc 1 261 0
+ 737              	 .cfi_startproc
+ 738 0000 80B5     	 push {r7,lr}
+ 739              	.LCFI27:
+ 740              	 .cfi_def_cfa_offset 8
+ 741              	 .cfi_offset 7,-8
+ 742              	 .cfi_offset 14,-4
+ 743 0002 84B0     	 sub sp,sp,#16
+ 744              	.LCFI28:
+ 745              	 .cfi_def_cfa_offset 24
+ 746 0004 00AF     	 add r7,sp,#0
+ 747              	.LCFI29:
+ 748              	 .cfi_def_cfa_register 7
+ 749 0006 F860     	 str r0,[r7,#12]
+ 750 0008 7A60     	 str r2,[r7,#4]
+ 751 000a 0B23     	 mov r3,#11
+ 752 000c FB18     	 add r3,r7,r3
+ 753 000e 0A1C     	 add r2,r1,#0
+ 754 0010 1A70     	 strb r2,[r3]
+ 262:../Libraries/XMCLib/src/xmc_usic.c ****   channel->RBCTR = (uint32_t)((channel->RBCTR & (~(uint32_t)(USIC_CH_INPR_Msk << (uint32_t)interrup
+ 755              	 .loc 1 262 0
+ 756 0012 FA68     	 ldr r2,[r7,#12]
+ 757 0014 8623     	 mov r3,#134
+ 758 0016 5B00     	 lsl r3,r3,#1
+ 759 0018 D358     	 ldr r3,[r2,r3]
+ 760 001a 0B22     	 mov r2,#11
+ 761 001c BA18     	 add r2,r7,r2
+ 762 001e 1278     	 ldrb r2,[r2]
+ 763 0020 0721     	 mov r1,#7
+ 764 0022 9140     	 lsl r1,r1,r2
+ 765 0024 0A1C     	 mov r2,r1
+ 766 0026 D243     	 mvn r2,r2
+ 767 0028 1A40     	 and r2,r3
+ 263:../Libraries/XMCLib/src/xmc_usic.c ****                    (service_request << (uint32_t)interrupt_node));
+ 768              	 .loc 1 263 0
+ 769 002a 0B23     	 mov r3,#11
+ 770 002c FB18     	 add r3,r7,r3
+ 771 002e 1B78     	 ldrb r3,[r3]
+ 772 0030 7968     	 ldr r1,[r7,#4]
+ 773 0032 9940     	 lsl r1,r1,r3
+ 774 0034 0B1C     	 mov r3,r1
+ 262:../Libraries/XMCLib/src/xmc_usic.c ****   channel->RBCTR = (uint32_t)((channel->RBCTR & (~(uint32_t)(USIC_CH_INPR_Msk << (uint32_t)interrup
+ 775              	 .loc 1 262 0
+ 776 0036 1A43     	 orr r2,r3
+ 777 0038 111C     	 mov r1,r2
+ 778 003a FA68     	 ldr r2,[r7,#12]
+ 779 003c 8623     	 mov r3,#134
+ 780 003e 5B00     	 lsl r3,r3,#1
+ 781 0040 D150     	 str r1,[r2,r3]
+ 264:../Libraries/XMCLib/src/xmc_usic.c **** }
+ 782              	 .loc 1 264 0
+ 783 0042 BD46     	 mov sp,r7
+ 784 0044 04B0     	 add sp,sp,#16
+ 785              	 
+ 786 0046 80BD     	 pop {r7,pc}
+ 787              	 .cfi_endproc
+ 788              	.LFE102:
+ 790              	 .text
+ 791              	.Letext0:
+ 792              	 .file 2 "c:\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 793              	 .file 3 "c:\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 794              	 .file 4 "D:/SoftWar_Debug/XMC1300_GPIO/Libraries/CMSIS/Infineon/XMC1300_series/Include/XMC1300.h"
+ 795              	 .file 5 "D:/SoftWar_Debug/XMC1300_GPIO/Libraries/XMCLib/inc/xmc_usic.h"
+ 796              	 .file 6 "D:/SoftWar_Debug/XMC1300_GPIO/Libraries/CMSIS/Infineon/XMC1300_series/Include/system_XMC1300.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 xmc_usic.c
+    {standard input}:18     .text.XMC_USIC_CH_Enable:00000000 $t
+    {standard input}:23     .text.XMC_USIC_CH_Enable:00000000 XMC_USIC_CH_Enable
+    {standard input}:86     .text.XMC_USIC_CH_Enable:00000048 $d
+    {standard input}:92     .text.XMC_USIC_CH_Disable:00000000 $t
+    {standard input}:97     .text.XMC_USIC_CH_Disable:00000000 XMC_USIC_CH_Disable
+    {standard input}:132    .text.XMC_USIC_CH_SetBaudrate:00000000 $t
+    {standard input}:137    .text.XMC_USIC_CH_SetBaudrate:00000000 XMC_USIC_CH_SetBaudrate
+    {standard input}:296    .text.XMC_USIC_CH_SetBaudrate:000000e4 $d
+    {standard input}:302    .text.XMC_USIC_CH_TXFIFO_Configure:00000000 $t
+    {standard input}:307    .text.XMC_USIC_CH_TXFIFO_Configure:00000000 XMC_USIC_CH_TXFIFO_Configure
+    {standard input}:373    .text.XMC_USIC_CH_TXFIFO_Configure:00000054 $d
+    {standard input}:379    .text.XMC_USIC_CH_RXFIFO_Configure:00000000 $t
+    {standard input}:384    .text.XMC_USIC_CH_RXFIFO_Configure:00000000 XMC_USIC_CH_RXFIFO_Configure
+    {standard input}:452    .text.XMC_USIC_CH_RXFIFO_Configure:0000005c $d
+    {standard input}:458    .text.XMC_USIC_CH_TXFIFO_SetSizeTriggerLimit:00000000 $t
+    {standard input}:463    .text.XMC_USIC_CH_TXFIFO_SetSizeTriggerLimit:00000000 XMC_USIC_CH_TXFIFO_SetSizeTriggerLimit
+    {standard input}:528    .text.XMC_USIC_CH_TXFIFO_SetSizeTriggerLimit:00000054 $d
+    {standard input}:534    .text.XMC_USIC_CH_RXFIFO_SetSizeTriggerLimit:00000000 $t
+    {standard input}:539    .text.XMC_USIC_CH_RXFIFO_SetSizeTriggerLimit:00000000 XMC_USIC_CH_RXFIFO_SetSizeTriggerLimit
+    {standard input}:604    .text.XMC_USIC_CH_RXFIFO_SetSizeTriggerLimit:00000054 $d
+    {standard input}:610    .text.XMC_USIC_CH_SetInterruptNodePointer:00000000 $t
+    {standard input}:615    .text.XMC_USIC_CH_SetInterruptNodePointer:00000000 XMC_USIC_CH_SetInterruptNodePointer
+    {standard input}:667    .text.XMC_USIC_CH_TXFIFO_SetInterruptNodePointer:00000000 $t
+    {standard input}:672    .text.XMC_USIC_CH_TXFIFO_SetInterruptNodePointer:00000000 XMC_USIC_CH_TXFIFO_SetInterruptNodePointer
+    {standard input}:729    .text.XMC_USIC_CH_RXFIFO_SetInterruptNodePointer:00000000 $t
+    {standard input}:734    .text.XMC_USIC_CH_RXFIFO_SetInterruptNodePointer:00000000 XMC_USIC_CH_RXFIFO_SetInterruptNodePointer
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+XMC_USIC_Enable
+__aeabi_uidiv
+XMC_SCU_CLOCK_GetPeripheralClockFrequency

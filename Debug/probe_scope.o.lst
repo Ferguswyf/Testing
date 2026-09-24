@@ -1,0 +1,3360 @@
+   1              	 .cpu cortex-m0
+   2              	 .fpu softvfp
+   3              	 .eabi_attribute 20,1
+   4              	 .eabi_attribute 21,1
+   5              	 .eabi_attribute 23,3
+   6              	 .eabi_attribute 24,1
+   7              	 .eabi_attribute 25,1
+   8              	 .eabi_attribute 26,1
+   9              	 .eabi_attribute 30,6
+  10              	 .eabi_attribute 34,0
+  11              	 .eabi_attribute 18,4
+  12              	 .code 16
+  13              	 .file "probe_scope.c"
+  14              	 .text
+  15              	.Ltext0:
+  16              	 .cfi_sections .debug_frame
+  17              	 .section .bss.ProbeScope_Ch1,"aw",%nobits
+  18              	 .align 2
+  21              	ProbeScope_Ch1:
+  22 0000 00000000 	 .space 4024
+  22      00000000 
+  22      00000000 
+  22      00000000 
+  22      00000000 
+  23              	 .section .bss.ProbeScope_Ch2,"aw",%nobits
+  24              	 .align 2
+  27              	ProbeScope_Ch2:
+  28 0000 00000000 	 .space 4024
+  28      00000000 
+  28      00000000 
+  28      00000000 
+  28      00000000 
+  29              	 .comm ProbeScope_DataRdyFlag,4,4
+  30              	 .comm ProbeScope_InitFlag,4,4
+  31              	 .section .bss.ProbeScope_Mode,"aw",%nobits
+  34              	ProbeScope_Mode:
+  35 0000 00       	 .space 1
+  36              	 .section .bss.ProbeScope_TrigChSel,"aw",%nobits
+  39              	ProbeScope_TrigChSel:
+  40 0000 00       	 .space 1
+  41              	 .comm ProbeScope_TrigDispPos,4,4
+  42              	 .comm ProbeScope_TrigFlag,4,4
+  43              	 .comm ProbeScope_TrigHoldOff,4,4
+  44              	 .section .bss.ProbeScope_TrigHoldOffCtr,"aw",%nobits
+  45              	 .align 2
+  48              	ProbeScope_TrigHoldOffCtr:
+  49 0000 00000000 	 .space 4
+  50              	 .comm ProbeScope_TrigIx,4,4
+  51              	 .section .bss.ProbeScope_TrigSlope,"aw",%nobits
+  52              	 .align 2
+  55              	ProbeScope_TrigSlope:
+  56 0000 00000000 	 .space 4
+  57              	 .section .bss.ProbeScope_SampleIxPrev,"aw",%nobits
+  58              	 .align 2
+  61              	ProbeScope_SampleIxPrev:
+  62 0000 00000000 	 .space 4
+  63              	 .section .bss.ProbeScope_SampleIxCur,"aw",%nobits
+  64              	 .align 2
+  67              	ProbeScope_SampleIxCur:
+  68 0000 00000000 	 .space 4
+  69              	 .section .bss.ProbeScope_SamplesPreTrigCtr,"aw",%nobits
+  70              	 .align 2
+  73              	ProbeScope_SamplesPreTrigCtr:
+  74 0000 00000000 	 .space 4
+  75              	 .section .bss.ProbeScope_SamplesPostTrigCtr,"aw",%nobits
+  76              	 .align 2
+  79              	ProbeScope_SamplesPostTrigCtr:
+  80 0000 00000000 	 .space 4
+  81              	 .section .bss.ProbeScope_SamplingClkDiv,"aw",%nobits
+  82              	 .align 1
+  85              	ProbeScope_SamplingClkDiv:
+  86 0000 0000     	 .space 2
+  87              	 .section .bss.ProbeScope_SamplingClkDivCtr,"aw",%nobits
+  88              	 .align 1
+  91              	ProbeScope_SamplingClkDivCtr:
+  92 0000 0000     	 .space 2
+  93              	 .comm ProbeScope_SamplingClkHz,4,4
+  94              	 .section .bss.ProbeScope_State,"aw",%nobits
+  97              	ProbeScope_State:
+  98 0000 00       	 .space 1
+  99              	 .section .data.ProbeScopeDbg_MaxSamples,"aw",%progbits
+ 100              	 .align 1
+ 103              	ProbeScopeDbg_MaxSamples:
+ 104 0000 E803     	 .short 1000
+ 105              	 .section .data.ProbeScopeDbg_MaxCh,"aw",%progbits
+ 108              	ProbeScopeDbg_MaxCh:
+ 109 0000 02       	 .byte 2
+ 110              	 .section .data.ProbeScopeDbg_16BitEn,"aw",%progbits
+ 111              	 .align 2
+ 114              	ProbeScopeDbg_16BitEn:
+ 115 0000 01000000 	 .word 1
+ 116              	 .section .data.ProbeScopeDbg_32BitEn,"aw",%progbits
+ 117              	 .align 2
+ 120              	ProbeScopeDbg_32BitEn:
+ 121 0000 01000000 	 .word 1
+ 122              	 .section .text.ProbeScope_Init,"ax",%progbits
+ 123              	 .align 2
+ 124              	 .global ProbeScope_Init
+ 125              	 .code 16
+ 126              	 .thumb_func
+ 128              	ProbeScope_Init:
+ 129              	.LFB0:
+ 130              	 .file 1 "../probe_scope.c"
+   1:../probe_scope.c **** /*
+   2:../probe_scope.c **** ***************************************************************************************************
+   3:../probe_scope.c **** *                                                     Oscilloscope
+   4:../probe_scope.c **** *
+   5:../probe_scope.c **** *                                    (c) Copyright 2016; Micrium, Inc.; Weston, FL
+   6:../probe_scope.c **** *                           All rights reserved.  Protected by international copyright laws.
+   7:../probe_scope.c **** *
+   8:../probe_scope.c **** *
+   9:../probe_scope.c **** * File    : PROBE_SCOPE.C
+  10:../probe_scope.c **** * By      : JJL
+  11:../probe_scope.c **** * Version : V1.00.00
+  12:../probe_scope.c **** ***************************************************************************************************
+  13:../probe_scope.c **** */
+  14:../probe_scope.c **** 
+  15:../probe_scope.c **** /*
+  16:../probe_scope.c **** ***************************************************************************************************
+  17:../probe_scope.c **** *                                             INCLUDE FILES
+  18:../probe_scope.c **** ***************************************************************************************************
+  19:../probe_scope.c **** */
+  20:../probe_scope.c **** 
+  21:../probe_scope.c **** #include  <probe_scope_cfg.h>
+  22:../probe_scope.c **** #include  <probe_scope.h>
+  23:../probe_scope.c **** 
+  24:../probe_scope.c **** /*
+  25:../probe_scope.c **** ***************************************************************************************************
+  26:../probe_scope.c **** *                                             CONSTANTS
+  27:../probe_scope.c **** ***************************************************************************************************
+  28:../probe_scope.c **** */
+  29:../probe_scope.c **** 
+  30:../probe_scope.c **** 
+  31:../probe_scope.c **** #define  PROBE_SCOPE_TRIG_NEG                  0                           // Trigger on Negative g
+  32:../probe_scope.c **** #define  PROBE_SCOPE_TRIG_POS                  1                           // Trigger on Positive g
+  33:../probe_scope.c **** 
+  34:../probe_scope.c **** 
+  35:../probe_scope.c **** #define  PROBE_SCOPE_STATE_START               0
+  36:../probe_scope.c **** #define  PROBE_SCOPE_STATE_SAMPLING_PRE_TRIG   1
+  37:../probe_scope.c **** #define  PROBE_SCOPE_STATE_SAMPLING_POST_TRIG  2
+  38:../probe_scope.c **** #define  PROBE_SCOPE_STATE_DATA_RDY            3
+  39:../probe_scope.c **** 
+  40:../probe_scope.c **** 
+  41:../probe_scope.c **** #define  PROBE_SCOPE_MODE_OFF                  0
+  42:../probe_scope.c **** #define  PROBE_SCOPE_MODE_SINGLE               1
+  43:../probe_scope.c **** #define  PROBE_SCOPE_MODE_CONTINUOUS           2
+  44:../probe_scope.c **** #define  PROBE_SCOPE_MODE_TRIG                 3
+  45:../probe_scope.c **** 
+  46:../probe_scope.c **** 
+  47:../probe_scope.c **** #define  PROBE_SCOPE_INT08U                    0                           // Supported data types
+  48:../probe_scope.c **** #define  PROBE_SCOPE_INT08S                    1
+  49:../probe_scope.c **** #define  PROBE_SCOPE_INT16U                    2
+  50:../probe_scope.c **** #define  PROBE_SCOPE_INT16S                    3
+  51:../probe_scope.c **** #define  PROBE_SCOPE_INT32U                    4
+  52:../probe_scope.c **** #define  PROBE_SCOPE_INT32S                    5
+  53:../probe_scope.c **** #define  PROBE_SCOPE_FP32                      6
+  54:../probe_scope.c **** 
+  55:../probe_scope.c **** 
+  56:../probe_scope.c **** #define  PROBE_SCOPE_CH1                       1
+  57:../probe_scope.c **** #define  PROBE_SCOPE_CH2                       2
+  58:../probe_scope.c **** #define  PROBE_SCOPE_CH3                       3
+  59:../probe_scope.c **** #define  PROBE_SCOPE_CH4                       4
+  60:../probe_scope.c **** #define  PROBE_SCOPE_CH5                       5
+  61:../probe_scope.c **** #define  PROBE_SCOPE_CH6                       6
+  62:../probe_scope.c **** #define  PROBE_SCOPE_CH7                       7
+  63:../probe_scope.c **** #define  PROBE_SCOPE_CH8                       8
+  64:../probe_scope.c **** 
+  65:../probe_scope.c **** /*
+  66:../probe_scope.c **** ***************************************************************************************************
+  67:../probe_scope.c **** *                                             DATA TYPES
+  68:../probe_scope.c **** ***************************************************************************************************
+  69:../probe_scope.c **** */
+  70:../probe_scope.c **** 
+  71:../probe_scope.c **** typedef  uint32_t                  CPU_BOOLEAN;                               //  8-bit boolean or 
+  72:../probe_scope.c **** typedef  uint8_t                   CPU_INT08U;                                //  8-bit unsigned in
+  73:../probe_scope.c **** typedef  int8_t                    CPU_INT08S;                                //  8-bit   signed in
+  74:../probe_scope.c **** typedef  uint16_t                  CPU_INT16U;                                // 16-bit unsigned in
+  75:../probe_scope.c **** typedef  int16_t                   CPU_INT16S;                                // 16-bit   signed in
+  76:../probe_scope.c **** typedef  uint32_t                  CPU_INT32U;                                // 32-bit unsigned in
+  77:../probe_scope.c **** typedef  int32_t                   CPU_INT32S;                                // 32-bit   signed in
+  78:../probe_scope.c **** typedef  uint64_t                  CPU_INT64U;                                // 64-bit unsigned in
+  79:../probe_scope.c **** typedef  int64_t                   CPU_INT64S;                                // 64-bit   signed in
+  80:../probe_scope.c **** 
+  81:../probe_scope.c **** typedef  float                     CPU_FP32;                                  // 32-bit floating po
+  82:../probe_scope.c **** typedef  double                    CPU_FP64;                                  // 64-bit floating po
+  83:../probe_scope.c **** 
+  84:../probe_scope.c **** 
+  85:../probe_scope.c **** typedef  struct  scope_ch          PROBE_SCOPE_CH;
+  86:../probe_scope.c **** typedef  union   scope_ch_sample   PROBE_SCOPE_CH_SAMPLE;
+  87:../probe_scope.c **** 
+  88:../probe_scope.c **** 
+  89:../probe_scope.c **** union  scope_ch_sample {                                                      // A sample can be an
+  90:../probe_scope.c ****     CPU_INT08U    Val08U;
+  91:../probe_scope.c ****     CPU_INT08S    Val08S;
+  92:../probe_scope.c **** #if PROBE_SCOPE_16_BIT_EN > 0                                                 // ... 16-bits only i
+  93:../probe_scope.c ****     CPU_INT16U    Val16U;
+  94:../probe_scope.c ****     CPU_INT16S    Val16S;
+  95:../probe_scope.c **** #endif
+  96:../probe_scope.c **** #if PROBE_SCOPE_32_BIT_EN > 0                                                 // ... 32-bits only i
+  97:../probe_scope.c ****     CPU_INT32U    Val32U;
+  98:../probe_scope.c ****     CPU_INT32S    Val32S;
+  99:../probe_scope.c ****     CPU_FP32      ValFP32;
+ 100:../probe_scope.c **** #endif
+ 101:../probe_scope.c **** };
+ 102:../probe_scope.c ****     
+ 103:../probe_scope.c **** 
+ 104:../probe_scope.c **** struct  scope_ch {
+ 105:../probe_scope.c ****     CPU_BOOLEAN            En;                                                // Channel enabled (1
+ 106:../probe_scope.c ****     CPU_INT08U             DataType;                                          // Source data type: 
+ 107:../probe_scope.c ****                                                                               //    0 = CPU_INT08U
+ 108:../probe_scope.c ****                                                                               //    1 = CPU_INT08S
+ 109:../probe_scope.c ****                                                                               //    2 = CPU_INT16U 
+ 110:../probe_scope.c ****                                                                               //    3 = CPU_INT16S 
+ 111:../probe_scope.c ****                                                                               //    4 = CPU_INT32U 
+ 112:../probe_scope.c ****                                                                               //    5 = CPU_INT32S 
+ 113:../probe_scope.c ****                                                                               //    6 = CPU_FP32   
+ 114:../probe_scope.c ****     CPU_BOOLEAN             BitEn;                                            // Bit mode enabled (
+ 115:../probe_scope.c ****     CPU_INT08U              BitSel;                                           // Selected bit in bi
+ 116:../probe_scope.c ****     CPU_INT08U             *DataAddr;                                         // Address of source 
+ 117:../probe_scope.c ****     PROBE_SCOPE_CH_SAMPLE   TrigLevel;                                        // Trigger level of t
+ 118:../probe_scope.c ****     PROBE_SCOPE_CH_SAMPLE   Samples[PROBE_SCOPE_MAX_SAMPLES];                 // Storage for sample
+ 119:../probe_scope.c **** };
+ 120:../probe_scope.c **** 
+ 121:../probe_scope.c **** /*
+ 122:../probe_scope.c **** ***************************************************************************************************
+ 123:../probe_scope.c **** *                                             LOCAL VARIABLES
+ 124:../probe_scope.c **** ***************************************************************************************************
+ 125:../probe_scope.c **** */
+ 126:../probe_scope.c **** 
+ 127:../probe_scope.c **** static    PROBE_SCOPE_CH       ProbeScope_Ch1;                                // Up to 8 scope chan
+ 128:../probe_scope.c **** 
+ 129:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 2
+ 130:../probe_scope.c **** static    PROBE_SCOPE_CH       ProbeScope_Ch2;
+ 131:../probe_scope.c **** #endif
+ 132:../probe_scope.c **** 
+ 133:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 3
+ 134:../probe_scope.c **** static    PROBE_SCOPE_CH       ProbeScope_Ch3;
+ 135:../probe_scope.c **** #endif
+ 136:../probe_scope.c **** 
+ 137:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 4
+ 138:../probe_scope.c **** static    PROBE_SCOPE_CH       ProbeScope_Ch4;
+ 139:../probe_scope.c **** #endif
+ 140:../probe_scope.c **** 
+ 141:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 5
+ 142:../probe_scope.c **** static    PROBE_SCOPE_CH       ProbeScope_Ch5;
+ 143:../probe_scope.c **** #endif
+ 144:../probe_scope.c **** 
+ 145:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 6
+ 146:../probe_scope.c **** static    PROBE_SCOPE_CH       ProbeScope_Ch6;
+ 147:../probe_scope.c **** #endif
+ 148:../probe_scope.c **** 
+ 149:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 7
+ 150:../probe_scope.c **** static    PROBE_SCOPE_CH       ProbeScope_Ch7;
+ 151:../probe_scope.c **** #endif
+ 152:../probe_scope.c **** 
+ 153:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 8
+ 154:../probe_scope.c **** static    PROBE_SCOPE_CH       ProbeScope_Ch8;
+ 155:../probe_scope.c **** #endif
+ 156:../probe_scope.c **** 
+ 157:../probe_scope.c **** volatile  CPU_INT32U           ProbeScope_DataRdyFlag;                        // Data is ready to b
+ 158:../probe_scope.c **** 
+ 159:../probe_scope.c **** volatile  CPU_BOOLEAN          ProbeScope_InitFlag;                           // Flag indicating MC
+ 160:../probe_scope.c **** 
+ 161:../probe_scope.c **** static    CPU_INT08U           ProbeScope_Mode;                               // Scope Mode:
+ 162:../probe_scope.c ****                                                                               //     0 = Stop
+ 163:../probe_scope.c ****                                                                               //     1 = Single
+ 164:../probe_scope.c ****                                                                               //     2 = Continuous
+ 165:../probe_scope.c ****                                                                               //     3 = Triggered 
+ 166:../probe_scope.c ****                                                                             
+ 167:../probe_scope.c **** static    CPU_INT08U           ProbeScope_TrigChSel;                          // Channel that will 
+ 168:../probe_scope.c ****                                                                               //     1 = Channel #1
+ 169:../probe_scope.c ****                                                                               //     2 = Channel #2
+ 170:../probe_scope.c ****                                                                               //     3 = Channel #3
+ 171:../probe_scope.c ****                                                                               //     4 = Channel #4
+ 172:../probe_scope.c ****                                                                               //     5 = Channel #5
+ 173:../probe_scope.c ****                                                                               //     6 = Channel #6
+ 174:../probe_scope.c ****                                                                               //     7 = Channel #7
+ 175:../probe_scope.c ****                                                                               //     8 = Channel #8
+ 176:../probe_scope.c ****                                                                             
+ 177:../probe_scope.c **** 
+ 178:../probe_scope.c **** volatile  CPU_INT32U           ProbeScope_TrigDispPos;                        // Position of the tr
+ 179:../probe_scope.c ****                                                                               //     0             
+ 180:../probe_scope.c ****                                                                               //     PROBE_SCOPE_MA
+ 181:../probe_scope.c **** volatile  CPU_BOOLEAN          ProbeScope_TrigFlag;                           // Flag indicating th
+ 182:../probe_scope.c **** volatile  CPU_INT32U           ProbeScope_TrigHoldOff;                        // Determines how man
+ 183:../probe_scope.c **** static    CPU_INT32U           ProbeScope_TrigHoldOffCtr;
+ 184:../probe_scope.c **** volatile  CPU_INT32U           ProbeScope_TrigIx;                             // Position in the sa
+ 185:../probe_scope.c **** static    CPU_BOOLEAN          ProbeScope_TrigSlope;                          // Trigger Slope
+ 186:../probe_scope.c ****                                                                               //     0 = Low  going
+ 187:../probe_scope.c ****                                                                               //     1 = High going
+ 188:../probe_scope.c **** 
+ 189:../probe_scope.c **** static    CPU_INT32U           ProbeScope_SampleIxPrev;
+ 190:../probe_scope.c **** static    CPU_INT32U           ProbeScope_SampleIxCur;
+ 191:../probe_scope.c **** static    CPU_INT32U           ProbeScope_SamplesPreTrigCtr;                  // Minimum number of 
+ 192:../probe_scope.c **** static    CPU_INT32U           ProbeScope_SamplesPostTrigCtr;                 // Determines how man
+ 193:../probe_scope.c ****                                                                               //     In 100% post-t
+ 194:../probe_scope.c ****                                                                               //     In 100% pre-tr
+ 195:../probe_scope.c **** 
+ 196:../probe_scope.c **** static    CPU_INT16U           ProbeScope_SamplingClkDiv;                     // Clk source divider
+ 197:../probe_scope.c **** static    CPU_INT16U           ProbeScope_SamplingClkDivCtr; 
+ 198:../probe_scope.c **** volatile  CPU_INT32U           ProbeScope_SamplingClkHz;                      // Sampling Clock Fre
+ 199:../probe_scope.c **** 
+ 200:../probe_scope.c **** static    CPU_INT08U           ProbeScope_State;                              // Scope State
+ 201:../probe_scope.c **** 
+ 202:../probe_scope.c **** /*
+ 203:../probe_scope.c **** ***************************************************************************************************
+ 204:../probe_scope.c **** *                                             CONSTANTS
+ 205:../probe_scope.c **** ***************************************************************************************************
+ 206:../probe_scope.c **** */
+ 207:../probe_scope.c **** 
+ 208:../probe_scope.c **** static  volatile  CPU_INT16U   ProbeScopeDbg_MaxSamples     = PROBE_SCOPE_MAX_SAMPLES;
+ 209:../probe_scope.c **** static  volatile  CPU_INT08U   ProbeScopeDbg_MaxCh          = PROBE_SCOPE_MAX_CH;
+ 210:../probe_scope.c **** static  volatile  CPU_BOOLEAN  ProbeScopeDbg_16BitEn        = PROBE_SCOPE_16_BIT_EN;
+ 211:../probe_scope.c **** static  volatile  CPU_BOOLEAN  ProbeScopeDbg_32BitEn        = PROBE_SCOPE_32_BIT_EN;
+ 212:../probe_scope.c **** 
+ 213:../probe_scope.c **** /*
+ 214:../probe_scope.c **** ***************************************************************************************************
+ 215:../probe_scope.c **** *                                             PROTOTYPES
+ 216:../probe_scope.c **** ***************************************************************************************************
+ 217:../probe_scope.c **** */
+ 218:../probe_scope.c **** 
+ 219:../probe_scope.c **** static  void       ProbeScope_IsTrig          (void);
+ 220:../probe_scope.c ****         
+ 221:../probe_scope.c **** static  void       ProbeScope_ModeOff         (void);
+ 222:../probe_scope.c **** static  void       ProbeScope_ModeContinuous  (void);
+ 223:../probe_scope.c **** static  void       ProbeScope_ModeTrig        (void);
+ 224:../probe_scope.c ****         
+ 225:../probe_scope.c **** static  void       ProbeScope_SampleChAll     (void);
+ 226:../probe_scope.c **** static  void       ProbeScope_SampleCh        (PROBE_SCOPE_CH  *p_ch);
+ 227:../probe_scope.c **** static  void       ProbeScope_SamplePosNext   (void);
+ 228:../probe_scope.c **** 
+ 229:../probe_scope.c **** /*
+ 230:../probe_scope.c **** ***************************************************************************************************
+ 231:../probe_scope.c **** *                                                    INITIALIZATION
+ 232:../probe_scope.c **** *
+ 233:../probe_scope.c **** * Description: This function is used to initialize the internals of the Oscilloscope module
+ 234:../probe_scope.c **** *
+ 235:../probe_scope.c **** * Arguments  : sampling_clk_hz    The frequency of the sampling clock (Hz)
+ 236:../probe_scope.c **** *
+ 237:../probe_scope.c **** * Returns    : none
+ 238:../probe_scope.c **** ***************************************************************************************************
+ 239:../probe_scope.c **** */
+ 240:../probe_scope.c **** 
+ 241:../probe_scope.c **** void  ProbeScope_Init (uint32_t  sampling_clk_hz)
+ 242:../probe_scope.c **** {
+ 131              	 .loc 1 242 0
+ 132              	 .cfi_startproc
+ 133 0000 80B5     	 push {r7,lr}
+ 134              	.LCFI0:
+ 135              	 .cfi_def_cfa_offset 8
+ 136              	 .cfi_offset 7,-8
+ 137              	 .cfi_offset 14,-4
+ 138 0002 82B0     	 sub sp,sp,#8
+ 139              	.LCFI1:
+ 140              	 .cfi_def_cfa_offset 16
+ 141 0004 00AF     	 add r7,sp,#0
+ 142              	.LCFI2:
+ 143              	 .cfi_def_cfa_register 7
+ 144 0006 7860     	 str r0,[r7,#4]
+ 243:../probe_scope.c ****     static  CPU_INT32U  temp = 0;
+ 244:../probe_scope.c **** 
+ 245:../probe_scope.c **** 
+ 246:../probe_scope.c ****     ProbeScope_Ch1.En             = 0;
+ 145              	 .loc 1 246 0
+ 146 0008 2D4B     	 ldr r3,.L2
+ 147 000a 0022     	 mov r2,#0
+ 148 000c 1A60     	 str r2,[r3]
+ 247:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 2       
+ 248:../probe_scope.c ****     ProbeScope_Ch2.En             = 0;
+ 149              	 .loc 1 248 0
+ 150 000e 2D4B     	 ldr r3,.L2+4
+ 151 0010 0022     	 mov r2,#0
+ 152 0012 1A60     	 str r2,[r3]
+ 249:../probe_scope.c **** #endif                            
+ 250:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 3       
+ 251:../probe_scope.c ****     ProbeScope_Ch3.En             = 0;
+ 252:../probe_scope.c **** #endif                            
+ 253:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 4       
+ 254:../probe_scope.c ****     ProbeScope_Ch4.En             = 0;
+ 255:../probe_scope.c **** #endif                            
+ 256:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 5       
+ 257:../probe_scope.c ****     ProbeScope_Ch5.En             = 0;
+ 258:../probe_scope.c **** #endif                            
+ 259:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 6       
+ 260:../probe_scope.c ****     ProbeScope_Ch6.En             = 0;
+ 261:../probe_scope.c **** #endif                            
+ 262:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 7       
+ 263:../probe_scope.c ****     ProbeScope_Ch7.En             = 0;
+ 264:../probe_scope.c **** #endif                            
+ 265:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 8       
+ 266:../probe_scope.c ****     ProbeScope_Ch8.En             = 0;
+ 267:../probe_scope.c **** #endif
+ 268:../probe_scope.c **** 
+ 269:../probe_scope.c ****     ProbeScope_Mode               = PROBE_SCOPE_MODE_OFF;
+ 153              	 .loc 1 269 0
+ 154 0014 2C4B     	 ldr r3,.L2+8
+ 155 0016 0022     	 mov r2,#0
+ 156 0018 1A70     	 strb r2,[r3]
+ 270:../probe_scope.c ****     ProbeScope_State              = PROBE_SCOPE_STATE_START;
+ 157              	 .loc 1 270 0
+ 158 001a 2C4B     	 ldr r3,.L2+12
+ 159 001c 0022     	 mov r2,#0
+ 160 001e 1A70     	 strb r2,[r3]
+ 271:../probe_scope.c ****     ProbeScope_TrigChSel          = PROBE_SCOPE_CH1;                         // Default trigger cha
+ 161              	 .loc 1 271 0
+ 162 0020 2B4B     	 ldr r3,.L2+16
+ 163 0022 0122     	 mov r2,#1
+ 164 0024 1A70     	 strb r2,[r3]
+ 272:../probe_scope.c ****     ProbeScope_SampleIxPrev       = 0;
+ 165              	 .loc 1 272 0
+ 166 0026 2B4B     	 ldr r3,.L2+20
+ 167 0028 0022     	 mov r2,#0
+ 168 002a 1A60     	 str r2,[r3]
+ 273:../probe_scope.c ****     ProbeScope_SampleIxCur        = 0;
+ 169              	 .loc 1 273 0
+ 170 002c 2A4B     	 ldr r3,.L2+24
+ 171 002e 0022     	 mov r2,#0
+ 172 0030 1A60     	 str r2,[r3]
+ 274:../probe_scope.c ****     ProbeScope_TrigFlag           = 0;
+ 173              	 .loc 1 274 0
+ 174 0032 2A4B     	 ldr r3,.L2+28
+ 175 0034 0022     	 mov r2,#0
+ 176 0036 1A60     	 str r2,[r3]
+ 275:../probe_scope.c ****     ProbeScope_TrigDispPos        = 0;
+ 177              	 .loc 1 275 0
+ 178 0038 294B     	 ldr r3,.L2+32
+ 179 003a 0022     	 mov r2,#0
+ 180 003c 1A60     	 str r2,[r3]
+ 276:../probe_scope.c ****     ProbeScope_TrigHoldOff        = 0;
+ 181              	 .loc 1 276 0
+ 182 003e 294B     	 ldr r3,.L2+36
+ 183 0040 0022     	 mov r2,#0
+ 184 0042 1A60     	 str r2,[r3]
+ 277:../probe_scope.c ****     ProbeScope_TrigHoldOffCtr     = 0;
+ 185              	 .loc 1 277 0
+ 186 0044 284B     	 ldr r3,.L2+40
+ 187 0046 0022     	 mov r2,#0
+ 188 0048 1A60     	 str r2,[r3]
+ 278:../probe_scope.c ****     ProbeScope_DataRdyFlag        = 0;
+ 189              	 .loc 1 278 0
+ 190 004a 284B     	 ldr r3,.L2+44
+ 191 004c 0022     	 mov r2,#0
+ 192 004e 1A60     	 str r2,[r3]
+ 279:../probe_scope.c ****     ProbeScope_SamplesPreTrigCtr  = ProbeScope_TrigDispPos;
+ 193              	 .loc 1 279 0
+ 194 0050 234B     	 ldr r3,.L2+32
+ 195 0052 1A68     	 ldr r2,[r3]
+ 196 0054 264B     	 ldr r3,.L2+48
+ 197 0056 1A60     	 str r2,[r3]
+ 280:../probe_scope.c ****     ProbeScope_SamplesPostTrigCtr = PROBE_SCOPE_MAX_SAMPLES;
+ 198              	 .loc 1 280 0
+ 199 0058 264B     	 ldr r3,.L2+52
+ 200 005a FA22     	 mov r2,#250
+ 201 005c 9200     	 lsl r2,r2,#2
+ 202 005e 1A60     	 str r2,[r3]
+ 281:../probe_scope.c ****     ProbeScope_TrigSlope          = PROBE_SCOPE_TRIG_POS;                    // We assume a positiv
+ 203              	 .loc 1 281 0
+ 204 0060 254B     	 ldr r3,.L2+56
+ 205 0062 0122     	 mov r2,#1
+ 206 0064 1A60     	 str r2,[r3]
+ 282:../probe_scope.c ****     temp                          = ProbeScopeDbg_MaxSamples;
+ 207              	 .loc 1 282 0
+ 208 0066 254B     	 ldr r3,.L2+60
+ 209 0068 1B88     	 ldrh r3,[r3]
+ 210 006a 9BB2     	 uxth r3,r3
+ 211 006c 1A1C     	 mov r2,r3
+ 212 006e 244B     	 ldr r3,.L2+64
+ 213 0070 1A60     	 str r2,[r3]
+ 283:../probe_scope.c ****     temp                         += ProbeScopeDbg_MaxCh;
+ 214              	 .loc 1 283 0
+ 215 0072 244B     	 ldr r3,.L2+68
+ 216 0074 1B78     	 ldrb r3,[r3]
+ 217 0076 DBB2     	 uxtb r3,r3
+ 218 0078 1A1C     	 mov r2,r3
+ 219 007a 214B     	 ldr r3,.L2+64
+ 220 007c 1B68     	 ldr r3,[r3]
+ 221 007e D218     	 add r2,r2,r3
+ 222 0080 1F4B     	 ldr r3,.L2+64
+ 223 0082 1A60     	 str r2,[r3]
+ 284:../probe_scope.c ****     temp                         += ProbeScopeDbg_16BitEn;
+ 224              	 .loc 1 284 0
+ 225 0084 204B     	 ldr r3,.L2+72
+ 226 0086 1A68     	 ldr r2,[r3]
+ 227 0088 1D4B     	 ldr r3,.L2+64
+ 228 008a 1B68     	 ldr r3,[r3]
+ 229 008c D218     	 add r2,r2,r3
+ 230 008e 1C4B     	 ldr r3,.L2+64
+ 231 0090 1A60     	 str r2,[r3]
+ 285:../probe_scope.c ****     temp                         += ProbeScopeDbg_32BitEn;
+ 232              	 .loc 1 285 0
+ 233 0092 1E4B     	 ldr r3,.L2+76
+ 234 0094 1A68     	 ldr r2,[r3]
+ 235 0096 1A4B     	 ldr r3,.L2+64
+ 236 0098 1B68     	 ldr r3,[r3]
+ 237 009a D218     	 add r2,r2,r3
+ 238 009c 184B     	 ldr r3,.L2+64
+ 239 009e 1A60     	 str r2,[r3]
+ 286:../probe_scope.c ****     ProbeScope_SamplingClkDiv     =    1;
+ 240              	 .loc 1 286 0
+ 241 00a0 1B4B     	 ldr r3,.L2+80
+ 242 00a2 0122     	 mov r2,#1
+ 243 00a4 1A80     	 strh r2,[r3]
+ 287:../probe_scope.c ****     ProbeScope_SamplingClkDivCtr  =    0;
+ 244              	 .loc 1 287 0
+ 245 00a6 1B4B     	 ldr r3,.L2+84
+ 246 00a8 0022     	 mov r2,#0
+ 247 00aa 1A80     	 strh r2,[r3]
+ 288:../probe_scope.c ****     ProbeScope_SamplingClkHz      = sampling_clk_hz;
+ 248              	 .loc 1 288 0
+ 249 00ac 1A4B     	 ldr r3,.L2+88
+ 250 00ae 7A68     	 ldr r2,[r7,#4]
+ 251 00b0 1A60     	 str r2,[r3]
+ 289:../probe_scope.c ****     ProbeScope_InitFlag           =    1;
+ 252              	 .loc 1 289 0
+ 253 00b2 1A4B     	 ldr r3,.L2+92
+ 254 00b4 0122     	 mov r2,#1
+ 255 00b6 1A60     	 str r2,[r3]
+ 290:../probe_scope.c **** }
+ 256              	 .loc 1 290 0
+ 257 00b8 BD46     	 mov sp,r7
+ 258 00ba 02B0     	 add sp,sp,#8
+ 259              	 
+ 260 00bc 80BD     	 pop {r7,pc}
+ 261              	.L3:
+ 262 00be C046     	 .align 2
+ 263              	.L2:
+ 264 00c0 00000000 	 .word ProbeScope_Ch1
+ 265 00c4 00000000 	 .word ProbeScope_Ch2
+ 266 00c8 00000000 	 .word ProbeScope_Mode
+ 267 00cc 00000000 	 .word ProbeScope_State
+ 268 00d0 00000000 	 .word ProbeScope_TrigChSel
+ 269 00d4 00000000 	 .word ProbeScope_SampleIxPrev
+ 270 00d8 00000000 	 .word ProbeScope_SampleIxCur
+ 271 00dc 00000000 	 .word ProbeScope_TrigFlag
+ 272 00e0 00000000 	 .word ProbeScope_TrigDispPos
+ 273 00e4 00000000 	 .word ProbeScope_TrigHoldOff
+ 274 00e8 00000000 	 .word ProbeScope_TrigHoldOffCtr
+ 275 00ec 00000000 	 .word ProbeScope_DataRdyFlag
+ 276 00f0 00000000 	 .word ProbeScope_SamplesPreTrigCtr
+ 277 00f4 00000000 	 .word ProbeScope_SamplesPostTrigCtr
+ 278 00f8 00000000 	 .word ProbeScope_TrigSlope
+ 279 00fc 00000000 	 .word ProbeScopeDbg_MaxSamples
+ 280 0100 00000000 	 .word temp.4197
+ 281 0104 00000000 	 .word ProbeScopeDbg_MaxCh
+ 282 0108 00000000 	 .word ProbeScopeDbg_16BitEn
+ 283 010c 00000000 	 .word ProbeScopeDbg_32BitEn
+ 284 0110 00000000 	 .word ProbeScope_SamplingClkDiv
+ 285 0114 00000000 	 .word ProbeScope_SamplingClkDivCtr
+ 286 0118 00000000 	 .word ProbeScope_SamplingClkHz
+ 287 011c 00000000 	 .word ProbeScope_InitFlag
+ 288              	 .cfi_endproc
+ 289              	.LFE0:
+ 291              	 .section .text.ProbeScope_Sampling,"ax",%progbits
+ 292              	 .align 2
+ 293              	 .global ProbeScope_Sampling
+ 294              	 .code 16
+ 295              	 .thumb_func
+ 297              	ProbeScope_Sampling:
+ 298              	.LFB1:
+ 291:../probe_scope.c **** 
+ 292:../probe_scope.c **** /*
+ 293:../probe_scope.c **** ***************************************************************************************************
+ 294:../probe_scope.c **** *                                                  Scope Sampling API
+ 295:../probe_scope.c **** *
+ 296:../probe_scope.c **** * Description: This function must be called when your code needs to take a sample of all enabled ch
+ 297:../probe_scope.c **** *
+ 298:../probe_scope.c **** * Arguments  : none
+ 299:../probe_scope.c **** * Returns    : none
+ 300:../probe_scope.c **** ***************************************************************************************************
+ 301:../probe_scope.c **** */
+ 302:../probe_scope.c **** 
+ 303:../probe_scope.c **** void  ProbeScope_Sampling (void)
+ 304:../probe_scope.c **** {
+ 299              	 .loc 1 304 0
+ 300              	 .cfi_startproc
+ 301 0000 80B5     	 push {r7,lr}
+ 302              	.LCFI3:
+ 303              	 .cfi_def_cfa_offset 8
+ 304              	 .cfi_offset 7,-8
+ 305              	 .cfi_offset 14,-4
+ 306 0002 00AF     	 add r7,sp,#0
+ 307              	.LCFI4:
+ 308              	 .cfi_def_cfa_register 7
+ 305:../probe_scope.c ****     switch (ProbeScope_Mode) {
+ 309              	 .loc 1 305 0
+ 310 0004 0D4B     	 ldr r3,.L11
+ 311 0006 1B78     	 ldrb r3,[r3]
+ 312 0008 012B     	 cmp r3,#1
+ 313 000a 0BD0     	 beq .L6
+ 314 000c 02DC     	 bgt .L7
+ 315 000e 002B     	 cmp r3,#0
+ 316 0010 05D0     	 beq .L8
+ 317 0012 10E0     	 b .L4
+ 318              	.L7:
+ 319 0014 022B     	 cmp r3,#2
+ 320 0016 08D0     	 beq .L9
+ 321 0018 032B     	 cmp r3,#3
+ 322 001a 09D0     	 beq .L10
+ 323 001c 0BE0     	 b .L4
+ 324              	.L8:
+ 306:../probe_scope.c ****         case PROBE_SCOPE_MODE_OFF:
+ 307:../probe_scope.c ****              ProbeScope_ModeOff();
+ 325              	 .loc 1 307 0
+ 326 001e FFF7FEFF 	 bl ProbeScope_ModeOff
+ 308:../probe_scope.c ****              break;
+ 327              	 .loc 1 308 0
+ 328 0022 08E0     	 b .L4
+ 329              	.L6:
+ 309:../probe_scope.c ****     
+ 310:../probe_scope.c ****         case PROBE_SCOPE_MODE_SINGLE:
+ 311:../probe_scope.c ****              ProbeScope_ModeTrig();
+ 330              	 .loc 1 311 0
+ 331 0024 FFF7FEFF 	 bl ProbeScope_ModeTrig
+ 312:../probe_scope.c ****              break;
+ 332              	 .loc 1 312 0
+ 333 0028 05E0     	 b .L4
+ 334              	.L9:
+ 313:../probe_scope.c ****     
+ 314:../probe_scope.c ****         case PROBE_SCOPE_MODE_CONTINUOUS:
+ 315:../probe_scope.c ****              ProbeScope_ModeContinuous();
+ 335              	 .loc 1 315 0
+ 336 002a FFF7FEFF 	 bl ProbeScope_ModeContinuous
+ 316:../probe_scope.c ****              break;
+ 337              	 .loc 1 316 0
+ 338 002e 02E0     	 b .L4
+ 339              	.L10:
+ 317:../probe_scope.c ****     
+ 318:../probe_scope.c ****         case PROBE_SCOPE_MODE_TRIG:
+ 319:../probe_scope.c ****              ProbeScope_ModeTrig(); 
+ 340              	 .loc 1 319 0
+ 341 0030 FFF7FEFF 	 bl ProbeScope_ModeTrig
+ 320:../probe_scope.c ****              break;
+ 342              	 .loc 1 320 0
+ 343 0034 C046     	 mov r8,r8
+ 344              	.L4:
+ 321:../probe_scope.c ****     }
+ 322:../probe_scope.c **** }
+ 345              	 .loc 1 322 0
+ 346 0036 BD46     	 mov sp,r7
+ 347              	 
+ 348 0038 80BD     	 pop {r7,pc}
+ 349              	.L12:
+ 350 003a C046     	 .align 2
+ 351              	.L11:
+ 352 003c 00000000 	 .word ProbeScope_Mode
+ 353              	 .cfi_endproc
+ 354              	.LFE1:
+ 356              	 .section .text.ProbeScope_ModeOff,"ax",%progbits
+ 357              	 .align 2
+ 358              	 .code 16
+ 359              	 .thumb_func
+ 361              	ProbeScope_ModeOff:
+ 362              	.LFB2:
+ 323:../probe_scope.c ****     
+ 324:../probe_scope.c **** 
+ 325:../probe_scope.c **** /*
+ 326:../probe_scope.c **** ***************************************************************************************************
+ 327:../probe_scope.c **** *                                                  OFF Sampling Mode
+ 328:../probe_scope.c **** *
+ 329:../probe_scope.c **** * Description: This is the state machine called when we are not reading samples
+ 330:../probe_scope.c **** *
+ 331:../probe_scope.c **** * Arguments  : none
+ 332:../probe_scope.c **** * Returns    : none
+ 333:../probe_scope.c **** ***************************************************************************************************
+ 334:../probe_scope.c **** */
+ 335:../probe_scope.c **** 
+ 336:../probe_scope.c **** static  void  ProbeScope_ModeOff (void)
+ 337:../probe_scope.c **** {
+ 363              	 .loc 1 337 0
+ 364              	 .cfi_startproc
+ 365 0000 80B5     	 push {r7,lr}
+ 366              	.LCFI5:
+ 367              	 .cfi_def_cfa_offset 8
+ 368              	 .cfi_offset 7,-8
+ 369              	 .cfi_offset 14,-4
+ 370 0002 00AF     	 add r7,sp,#0
+ 371              	.LCFI6:
+ 372              	 .cfi_def_cfa_register 7
+ 338:../probe_scope.c ****     ProbeScope_State = PROBE_SCOPE_STATE_START;                                // Force Triggered m
+ 373              	 .loc 1 338 0
+ 374 0004 054B     	 ldr r3,.L15
+ 375 0006 0022     	 mov r2,#0
+ 376 0008 1A70     	 strb r2,[r3]
+ 339:../probe_scope.c ****     if (ProbeScope_SamplingClkDiv == 0) {
+ 377              	 .loc 1 339 0
+ 378 000a 054B     	 ldr r3,.L15+4
+ 379 000c 1B88     	 ldrh r3,[r3]
+ 380 000e 002B     	 cmp r3,#0
+ 381 0010 02D1     	 bne .L13
+ 340:../probe_scope.c ****         ProbeScope_SamplingClkDiv =  1;
+ 382              	 .loc 1 340 0
+ 383 0012 034B     	 ldr r3,.L15+4
+ 384 0014 0122     	 mov r2,#1
+ 385 0016 1A80     	 strh r2,[r3]
+ 386              	.L13:
+ 341:../probe_scope.c ****     }
+ 342:../probe_scope.c **** }
+ 387              	 .loc 1 342 0
+ 388 0018 BD46     	 mov sp,r7
+ 389              	 
+ 390 001a 80BD     	 pop {r7,pc}
+ 391              	.L16:
+ 392              	 .align 2
+ 393              	.L15:
+ 394 001c 00000000 	 .word ProbeScope_State
+ 395 0020 00000000 	 .word ProbeScope_SamplingClkDiv
+ 396              	 .cfi_endproc
+ 397              	.LFE2:
+ 399              	 .section .text.ProbeScope_ModeContinuous,"ax",%progbits
+ 400              	 .align 2
+ 401              	 .code 16
+ 402              	 .thumb_func
+ 404              	ProbeScope_ModeContinuous:
+ 405              	.LFB3:
+ 343:../probe_scope.c ****          
+ 344:../probe_scope.c **** /*
+ 345:../probe_scope.c **** ***************************************************************************************************
+ 346:../probe_scope.c **** *                                                Continuous Sampling Mode
+ 347:../probe_scope.c **** *
+ 348:../probe_scope.c **** * Description: This is the state machine called when continuous mode is selected
+ 349:../probe_scope.c **** *
+ 350:../probe_scope.c **** * Arguments  : none
+ 351:../probe_scope.c **** * Returns    : none
+ 352:../probe_scope.c **** ***************************************************************************************************
+ 353:../probe_scope.c **** */
+ 354:../probe_scope.c **** 
+ 355:../probe_scope.c **** static  void  ProbeScope_ModeContinuous (void)
+ 356:../probe_scope.c **** {
+ 406              	 .loc 1 356 0
+ 407              	 .cfi_startproc
+ 408 0000 80B5     	 push {r7,lr}
+ 409              	.LCFI7:
+ 410              	 .cfi_def_cfa_offset 8
+ 411              	 .cfi_offset 7,-8
+ 412              	 .cfi_offset 14,-4
+ 413 0002 00AF     	 add r7,sp,#0
+ 414              	.LCFI8:
+ 415              	 .cfi_def_cfa_register 7
+ 357:../probe_scope.c ****     if (ProbeScope_DataRdyFlag == 0) {                                          // Read one buffer'
+ 416              	 .loc 1 357 0
+ 417 0004 174B     	 ldr r3,.L21
+ 418 0006 1B68     	 ldr r3,[r3]
+ 419 0008 002B     	 cmp r3,#0
+ 420 000a 26D1     	 bne .L18
+ 358:../probe_scope.c ****         ProbeScope_TrigFlag = 0;
+ 421              	 .loc 1 358 0
+ 422 000c 164B     	 ldr r3,.L21+4
+ 423 000e 0022     	 mov r2,#0
+ 424 0010 1A60     	 str r2,[r3]
+ 359:../probe_scope.c ****         if (ProbeScope_SamplingClkDivCtr > 1) {
+ 425              	 .loc 1 359 0
+ 426 0012 164B     	 ldr r3,.L21+8
+ 427 0014 1B88     	 ldrh r3,[r3]
+ 428 0016 012B     	 cmp r3,#1
+ 429 0018 06D9     	 bls .L19
+ 360:../probe_scope.c ****             ProbeScope_SamplingClkDivCtr--;
+ 430              	 .loc 1 360 0
+ 431 001a 144B     	 ldr r3,.L21+8
+ 432 001c 1B88     	 ldrh r3,[r3]
+ 433 001e 013B     	 sub r3,r3,#1
+ 434 0020 9AB2     	 uxth r2,r3
+ 435 0022 124B     	 ldr r3,.L21+8
+ 436 0024 1A80     	 strh r2,[r3]
+ 437 0026 18E0     	 b .L18
+ 438              	.L19:
+ 361:../probe_scope.c ****         } else {
+ 362:../probe_scope.c ****             if (ProbeScope_SamplingClkDiv == 0) {                               // Make sure clock 
+ 439              	 .loc 1 362 0
+ 440 0028 114B     	 ldr r3,.L21+12
+ 441 002a 1B88     	 ldrh r3,[r3]
+ 442 002c 002B     	 cmp r3,#0
+ 443 002e 02D1     	 bne .L20
+ 363:../probe_scope.c ****                 ProbeScope_SamplingClkDiv =  1;
+ 444              	 .loc 1 363 0
+ 445 0030 0F4B     	 ldr r3,.L21+12
+ 446 0032 0122     	 mov r2,#1
+ 447 0034 1A80     	 strh r2,[r3]
+ 448              	.L20:
+ 364:../probe_scope.c ****             }
+ 365:../probe_scope.c ****             ProbeScope_SamplingClkDivCtr  = ProbeScope_SamplingClkDiv;
+ 449              	 .loc 1 365 0
+ 450 0036 0E4B     	 ldr r3,.L21+12
+ 451 0038 1A88     	 ldrh r2,[r3]
+ 452 003a 0C4B     	 ldr r3,.L21+8
+ 453 003c 1A80     	 strh r2,[r3]
+ 366:../probe_scope.c ****             ProbeScope_SampleChAll();                                           // Get the first sa
+ 454              	 .loc 1 366 0
+ 455 003e FFF7FEFF 	 bl ProbeScope_SampleChAll
+ 367:../probe_scope.c ****             ProbeScope_SamplePosNext();                                         // Position to next
+ 456              	 .loc 1 367 0
+ 457 0042 FFF7FEFF 	 bl ProbeScope_SamplePosNext
+ 368:../probe_scope.c ****             if (ProbeScope_SampleIxCur == 0) {                                  // Read one buffer'
+ 458              	 .loc 1 368 0
+ 459 0046 0B4B     	 ldr r3,.L21+16
+ 460 0048 1B68     	 ldr r3,[r3]
+ 461 004a 002B     	 cmp r3,#0
+ 462 004c 05D1     	 bne .L18
+ 369:../probe_scope.c ****                 ProbeScope_DataRdyFlag = 1;   
+ 463              	 .loc 1 369 0
+ 464 004e 054B     	 ldr r3,.L21
+ 465 0050 0122     	 mov r2,#1
+ 466 0052 1A60     	 str r2,[r3]
+ 370:../probe_scope.c ****                 ProbeScope_TrigFlag    = 1;
+ 467              	 .loc 1 370 0
+ 468 0054 044B     	 ldr r3,.L21+4
+ 469 0056 0122     	 mov r2,#1
+ 470 0058 1A60     	 str r2,[r3]
+ 471              	.L18:
+ 371:../probe_scope.c ****             }
+ 372:../probe_scope.c ****         }
+ 373:../probe_scope.c ****     }
+ 374:../probe_scope.c ****     ProbeScope_State = PROBE_SCOPE_STATE_START;                                 // Force Triggered 
+ 472              	 .loc 1 374 0
+ 473 005a 074B     	 ldr r3,.L21+20
+ 474 005c 0022     	 mov r2,#0
+ 475 005e 1A70     	 strb r2,[r3]
+ 375:../probe_scope.c **** }
+ 476              	 .loc 1 375 0
+ 477 0060 BD46     	 mov sp,r7
+ 478              	 
+ 479 0062 80BD     	 pop {r7,pc}
+ 480              	.L22:
+ 481              	 .align 2
+ 482              	.L21:
+ 483 0064 00000000 	 .word ProbeScope_DataRdyFlag
+ 484 0068 00000000 	 .word ProbeScope_TrigFlag
+ 485 006c 00000000 	 .word ProbeScope_SamplingClkDivCtr
+ 486 0070 00000000 	 .word ProbeScope_SamplingClkDiv
+ 487 0074 00000000 	 .word ProbeScope_SampleIxCur
+ 488 0078 00000000 	 .word ProbeScope_State
+ 489              	 .cfi_endproc
+ 490              	.LFE3:
+ 492              	 .section .text.ProbeScope_ModeTrig,"ax",%progbits
+ 493              	 .align 2
+ 494              	 .code 16
+ 495              	 .thumb_func
+ 497              	ProbeScope_ModeTrig:
+ 498              	.LFB4:
+ 376:../probe_scope.c **** 
+ 377:../probe_scope.c **** /*
+ 378:../probe_scope.c **** ***************************************************************************************************
+ 379:../probe_scope.c **** *                                                 Triggered Sampling
+ 380:../probe_scope.c **** *
+ 381:../probe_scope.c **** * Description: This is the state machine called when triggered mode is selected
+ 382:../probe_scope.c **** *
+ 383:../probe_scope.c **** * Arguments  : none
+ 384:../probe_scope.c **** * Returns    : none
+ 385:../probe_scope.c **** ***************************************************************************************************
+ 386:../probe_scope.c **** */
+ 387:../probe_scope.c **** 
+ 388:../probe_scope.c **** static  void  ProbeScope_ModeTrig (void)
+ 389:../probe_scope.c **** {
+ 499              	 .loc 1 389 0
+ 500              	 .cfi_startproc
+ 501 0000 80B5     	 push {r7,lr}
+ 502              	.LCFI9:
+ 503              	 .cfi_def_cfa_offset 8
+ 504              	 .cfi_offset 7,-8
+ 505              	 .cfi_offset 14,-4
+ 506 0002 00AF     	 add r7,sp,#0
+ 507              	.LCFI10:
+ 508              	 .cfi_def_cfa_register 7
+ 390:../probe_scope.c ****     if (ProbeScope_SamplingClkDivCtr > 1) {
+ 509              	 .loc 1 390 0
+ 510 0004 534B     	 ldr r3,.L42
+ 511 0006 1B88     	 ldrh r3,[r3]
+ 512 0008 012B     	 cmp r3,#1
+ 513 000a 06D9     	 bls .L24
+ 391:../probe_scope.c ****         ProbeScope_SamplingClkDivCtr--;
+ 514              	 .loc 1 391 0
+ 515 000c 514B     	 ldr r3,.L42
+ 516 000e 1B88     	 ldrh r3,[r3]
+ 517 0010 013B     	 sub r3,r3,#1
+ 518 0012 9AB2     	 uxth r2,r3
+ 519 0014 4F4B     	 ldr r3,.L42
+ 520 0016 1A80     	 strh r2,[r3]
+ 521 0018 9AE0     	 b .L23
+ 522              	.L24:
+ 392:../probe_scope.c ****     } else { 
+ 393:../probe_scope.c ****         if (ProbeScope_SamplingClkDiv == 0) {                                        // Make sure c
+ 523              	 .loc 1 393 0
+ 524 001a 4F4B     	 ldr r3,.L42+4
+ 525 001c 1B88     	 ldrh r3,[r3]
+ 526 001e 002B     	 cmp r3,#0
+ 527 0020 02D1     	 bne .L26
+ 394:../probe_scope.c ****             ProbeScope_SamplingClkDiv =  1;
+ 528              	 .loc 1 394 0
+ 529 0022 4D4B     	 ldr r3,.L42+4
+ 530 0024 0122     	 mov r2,#1
+ 531 0026 1A80     	 strh r2,[r3]
+ 532              	.L26:
+ 395:../probe_scope.c ****         }
+ 396:../probe_scope.c ****         ProbeScope_SamplingClkDivCtr = ProbeScope_SamplingClkDiv;
+ 533              	 .loc 1 396 0
+ 534 0028 4B4B     	 ldr r3,.L42+4
+ 535 002a 1A88     	 ldrh r2,[r3]
+ 536 002c 494B     	 ldr r3,.L42
+ 537 002e 1A80     	 strh r2,[r3]
+ 397:../probe_scope.c ****         switch (ProbeScope_State) {
+ 538              	 .loc 1 397 0
+ 539 0030 4A4B     	 ldr r3,.L42+8
+ 540 0032 1B78     	 ldrb r3,[r3]
+ 541 0034 012B     	 cmp r3,#1
+ 542 0036 26D0     	 beq .L28
+ 543 0038 02DC     	 bgt .L29
+ 544 003a 002B     	 cmp r3,#0
+ 545 003c 05D0     	 beq .L30
+ 546 003e 83E0     	 b .L27
+ 547              	.L29:
+ 548 0040 022B     	 cmp r3,#2
+ 549 0042 3FD0     	 beq .L31
+ 550 0044 032B     	 cmp r3,#3
+ 551 0046 61D0     	 beq .L32
+ 552 0048 7EE0     	 b .L27
+ 553              	.L30:
+ 398:../probe_scope.c ****             case PROBE_SCOPE_STATE_START:
+ 399:../probe_scope.c ****                  ProbeScope_DataRdyFlag        = 0;
+ 554              	 .loc 1 399 0
+ 555 004a 454B     	 ldr r3,.L42+12
+ 556 004c 0022     	 mov r2,#0
+ 557 004e 1A60     	 str r2,[r3]
+ 400:../probe_scope.c ****                  ProbeScope_TrigFlag           = 0;
+ 558              	 .loc 1 400 0
+ 559 0050 444B     	 ldr r3,.L42+16
+ 560 0052 0022     	 mov r2,#0
+ 561 0054 1A60     	 str r2,[r3]
+ 401:../probe_scope.c ****                  ProbeScope_SampleIxPrev       = 0;
+ 562              	 .loc 1 401 0
+ 563 0056 444B     	 ldr r3,.L42+20
+ 564 0058 0022     	 mov r2,#0
+ 565 005a 1A60     	 str r2,[r3]
+ 402:../probe_scope.c ****                  ProbeScope_SampleIxCur        = 0;
+ 566              	 .loc 1 402 0
+ 567 005c 434B     	 ldr r3,.L42+24
+ 568 005e 0022     	 mov r2,#0
+ 569 0060 1A60     	 str r2,[r3]
+ 403:../probe_scope.c ****                  ProbeScope_TrigHoldOffCtr     = 0;
+ 570              	 .loc 1 403 0
+ 571 0062 434B     	 ldr r3,.L42+28
+ 572 0064 0022     	 mov r2,#0
+ 573 0066 1A60     	 str r2,[r3]
+ 404:../probe_scope.c ****                  ProbeScope_SamplesPostTrigCtr = 0;
+ 574              	 .loc 1 404 0
+ 575 0068 424B     	 ldr r3,.L42+32
+ 576 006a 0022     	 mov r2,#0
+ 577 006c 1A60     	 str r2,[r3]
+ 405:../probe_scope.c ****                  ProbeScope_SamplesPreTrigCtr  = ProbeScope_TrigDispPos;            // Minimum numb
+ 578              	 .loc 1 405 0
+ 579 006e 424B     	 ldr r3,.L42+36
+ 580 0070 1A68     	 ldr r2,[r3]
+ 581 0072 424B     	 ldr r3,.L42+40
+ 582 0074 1A60     	 str r2,[r3]
+ 406:../probe_scope.c ****                  ProbeScope_SampleChAll();                                          // Get the firs
+ 583              	 .loc 1 406 0
+ 584 0076 FFF7FEFF 	 bl ProbeScope_SampleChAll
+ 407:../probe_scope.c ****                  ProbeScope_SamplePosNext();
+ 585              	 .loc 1 407 0
+ 586 007a FFF7FEFF 	 bl ProbeScope_SamplePosNext
+ 408:../probe_scope.c ****                  ProbeScope_State              = PROBE_SCOPE_STATE_SAMPLING_PRE_TRIG;
+ 587              	 .loc 1 408 0
+ 588 007e 374B     	 ldr r3,.L42+8
+ 589 0080 0122     	 mov r2,#1
+ 590 0082 1A70     	 strb r2,[r3]
+ 409:../probe_scope.c ****                  break;
+ 591              	 .loc 1 409 0
+ 592 0084 64E0     	 b .L23
+ 593              	.L28:
+ 410:../probe_scope.c ****                  
+ 411:../probe_scope.c ****             case PROBE_SCOPE_STATE_SAMPLING_PRE_TRIG:
+ 412:../probe_scope.c ****                  ProbeScope_SampleChAll();                                          // Get the next
+ 594              	 .loc 1 412 0
+ 595 0086 FFF7FEFF 	 bl ProbeScope_SampleChAll
+ 413:../probe_scope.c ****                  if (ProbeScope_SamplesPreTrigCtr > 0) {                            // We need a mi
+ 596              	 .loc 1 413 0
+ 597 008a 3C4B     	 ldr r3,.L42+40
+ 598 008c 1B68     	 ldr r3,[r3]
+ 599 008e 002B     	 cmp r3,#0
+ 600 0090 05D0     	 beq .L33
+ 414:../probe_scope.c ****                      ProbeScope_SamplesPreTrigCtr--;                               
+ 601              	 .loc 1 414 0
+ 602 0092 3A4B     	 ldr r3,.L42+40
+ 603 0094 1B68     	 ldr r3,[r3]
+ 604 0096 5A1E     	 sub r2,r3,#1
+ 605 0098 384B     	 ldr r3,.L42+40
+ 606 009a 1A60     	 str r2,[r3]
+ 607 009c 01E0     	 b .L34
+ 608              	.L33:
+ 415:../probe_scope.c ****                  } else {
+ 416:../probe_scope.c ****                      ProbeScope_IsTrig();                                           // See if we de
+ 609              	 .loc 1 416 0
+ 610 009e FFF7FEFF 	 bl ProbeScope_IsTrig
+ 611              	.L34:
+ 417:../probe_scope.c ****                  }
+ 418:../probe_scope.c ****                  ProbeScope_SamplePosNext();
+ 612              	 .loc 1 418 0
+ 613 00a2 FFF7FEFF 	 bl ProbeScope_SamplePosNext
+ 419:../probe_scope.c ****                  if (ProbeScope_TrigFlag == 1) {                                    // Remaining nu
+ 614              	 .loc 1 419 0
+ 615 00a6 2F4B     	 ldr r3,.L42+16
+ 616 00a8 1B68     	 ldr r3,[r3]
+ 617 00aa 012B     	 cmp r3,#1
+ 618 00ac 09D1     	 bne .L35
+ 420:../probe_scope.c ****                      ProbeScope_SamplesPostTrigCtr = PROBE_SCOPE_MAX_SAMPLES - ProbeScope_TrigDispP
+ 619              	 .loc 1 420 0
+ 620 00ae 324B     	 ldr r3,.L42+36
+ 621 00b0 1B68     	 ldr r3,[r3]
+ 622 00b2 334A     	 ldr r2,.L42+44
+ 623 00b4 D21A     	 sub r2,r2,r3
+ 624 00b6 2F4B     	 ldr r3,.L42+32
+ 625 00b8 1A60     	 str r2,[r3]
+ 421:../probe_scope.c ****                      ProbeScope_State              = PROBE_SCOPE_STATE_SAMPLING_POST_TRIG;
+ 626              	 .loc 1 421 0
+ 627 00ba 284B     	 ldr r3,.L42+8
+ 628 00bc 0222     	 mov r2,#2
+ 629 00be 1A70     	 strb r2,[r3]
+ 422:../probe_scope.c ****                  }
+ 423:../probe_scope.c ****                  break;
+ 630              	 .loc 1 423 0
+ 631 00c0 46E0     	 b .L23
+ 632              	.L35:
+ 633 00c2 45E0     	 b .L23
+ 634              	.L31:
+ 424:../probe_scope.c ****                  
+ 425:../probe_scope.c ****             case PROBE_SCOPE_STATE_SAMPLING_POST_TRIG:
+ 426:../probe_scope.c ****                  ProbeScope_SampleChAll();                                          // Get the next
+ 635              	 .loc 1 426 0
+ 636 00c4 FFF7FEFF 	 bl ProbeScope_SampleChAll
+ 427:../probe_scope.c ****                  ProbeScope_SamplePosNext();
+ 637              	 .loc 1 427 0
+ 638 00c8 FFF7FEFF 	 bl ProbeScope_SamplePosNext
+ 428:../probe_scope.c ****                  if (ProbeScope_SamplesPostTrigCtr > 0) {
+ 639              	 .loc 1 428 0
+ 640 00cc 294B     	 ldr r3,.L42+32
+ 641 00ce 1B68     	 ldr r3,[r3]
+ 642 00d0 002B     	 cmp r3,#0
+ 643 00d2 05D0     	 beq .L36
+ 429:../probe_scope.c ****                      ProbeScope_SamplesPostTrigCtr--;
+ 644              	 .loc 1 429 0
+ 645 00d4 274B     	 ldr r3,.L42+32
+ 646 00d6 1B68     	 ldr r3,[r3]
+ 647 00d8 5A1E     	 sub r2,r3,#1
+ 648 00da 264B     	 ldr r3,.L42+32
+ 649 00dc 1A60     	 str r2,[r3]
+ 430:../probe_scope.c ****                  } else {
+ 431:../probe_scope.c ****                      if (ProbeScope_Mode == PROBE_SCOPE_MODE_SINGLE) {
+ 432:../probe_scope.c ****                          ProbeScope_Mode           = PROBE_SCOPE_MODE_OFF;
+ 433:../probe_scope.c ****                          ProbeScope_State          = PROBE_SCOPE_STATE_START;
+ 434:../probe_scope.c ****                      } else {
+ 435:../probe_scope.c ****                          ProbeScope_TrigHoldOffCtr = ProbeScope_TrigHoldOff;        // Load hold-of
+ 436:../probe_scope.c ****                          ProbeScope_State          = PROBE_SCOPE_STATE_DATA_RDY;    
+ 437:../probe_scope.c ****                      }                                                              
+ 438:../probe_scope.c ****                      ProbeScope_DataRdyFlag = 1;                                    // Trace is ava
+ 439:../probe_scope.c ****                  }                                                                  
+ 440:../probe_scope.c ****                  break;                                                             
+ 650              	 .loc 1 440 0
+ 651 00de 37E0     	 b .L23
+ 652              	.L36:
+ 431:../probe_scope.c ****                          ProbeScope_Mode           = PROBE_SCOPE_MODE_OFF;
+ 653              	 .loc 1 431 0
+ 654 00e0 284B     	 ldr r3,.L42+48
+ 655 00e2 1B78     	 ldrb r3,[r3]
+ 656 00e4 012B     	 cmp r3,#1
+ 657 00e6 06D1     	 bne .L38
+ 432:../probe_scope.c ****                          ProbeScope_State          = PROBE_SCOPE_STATE_START;
+ 658              	 .loc 1 432 0
+ 659 00e8 264B     	 ldr r3,.L42+48
+ 660 00ea 0022     	 mov r2,#0
+ 661 00ec 1A70     	 strb r2,[r3]
+ 433:../probe_scope.c ****                      } else {
+ 662              	 .loc 1 433 0
+ 663 00ee 1B4B     	 ldr r3,.L42+8
+ 664 00f0 0022     	 mov r2,#0
+ 665 00f2 1A70     	 strb r2,[r3]
+ 666 00f4 06E0     	 b .L39
+ 667              	.L38:
+ 435:../probe_scope.c ****                          ProbeScope_State          = PROBE_SCOPE_STATE_DATA_RDY;    
+ 668              	 .loc 1 435 0
+ 669 00f6 244B     	 ldr r3,.L42+52
+ 670 00f8 1A68     	 ldr r2,[r3]
+ 671 00fa 1D4B     	 ldr r3,.L42+28
+ 672 00fc 1A60     	 str r2,[r3]
+ 436:../probe_scope.c ****                      }                                                              
+ 673              	 .loc 1 436 0
+ 674 00fe 174B     	 ldr r3,.L42+8
+ 675 0100 0322     	 mov r2,#3
+ 676 0102 1A70     	 strb r2,[r3]
+ 677              	.L39:
+ 438:../probe_scope.c ****                  }                                                                  
+ 678              	 .loc 1 438 0
+ 679 0104 164B     	 ldr r3,.L42+12
+ 680 0106 0122     	 mov r2,#1
+ 681 0108 1A60     	 str r2,[r3]
+ 682              	 .loc 1 440 0
+ 683 010a 21E0     	 b .L23
+ 684              	.L32:
+ 441:../probe_scope.c ****                                                                                     
+ 442:../probe_scope.c ****             case PROBE_SCOPE_STATE_DATA_RDY:                                        
+ 443:../probe_scope.c ****                  if (ProbeScope_TrigHoldOffCtr > 0) {                               // Hold-off bef
+ 685              	 .loc 1 443 0
+ 686 010c 184B     	 ldr r3,.L42+28
+ 687 010e 1B68     	 ldr r3,[r3]
+ 688 0110 002B     	 cmp r3,#0
+ 689 0112 05D0     	 beq .L40
+ 444:../probe_scope.c ****                      ProbeScope_TrigHoldOffCtr--;                                   
+ 690              	 .loc 1 444 0
+ 691 0114 164B     	 ldr r3,.L42+28
+ 692 0116 1B68     	 ldr r3,[r3]
+ 693 0118 5A1E     	 sub r2,r3,#1
+ 694 011a 154B     	 ldr r3,.L42+28
+ 695 011c 1A60     	 str r2,[r3]
+ 696 011e 12E0     	 b .L41
+ 697              	.L40:
+ 445:../probe_scope.c ****                  } else {                                                           
+ 446:../probe_scope.c ****                      if (ProbeScope_DataRdyFlag == 0) {                             // Give Probe t
+ 698              	 .loc 1 446 0
+ 699 0120 0F4B     	 ldr r3,.L42+12
+ 700 0122 1B68     	 ldr r3,[r3]
+ 701 0124 002B     	 cmp r3,#0
+ 702 0126 0ED1     	 bne .L41
+ 447:../probe_scope.c ****                          ProbeScope_TrigFlag          = 0;
+ 703              	 .loc 1 447 0
+ 704 0128 0E4B     	 ldr r3,.L42+16
+ 705 012a 0022     	 mov r2,#0
+ 706 012c 1A60     	 str r2,[r3]
+ 448:../probe_scope.c ****                          ProbeScope_SamplesPreTrigCtr = ProbeScope_TrigDispPos;     // Minimum numb
+ 707              	 .loc 1 448 0
+ 708 012e 124B     	 ldr r3,.L42+36
+ 709 0130 1A68     	 ldr r2,[r3]
+ 710 0132 124B     	 ldr r3,.L42+40
+ 711 0134 1A60     	 str r2,[r3]
+ 449:../probe_scope.c ****                          ProbeScope_State             = PROBE_SCOPE_STATE_SAMPLING_PRE_TRIG;
+ 712              	 .loc 1 449 0
+ 713 0136 094B     	 ldr r3,.L42+8
+ 714 0138 0122     	 mov r2,#1
+ 715 013a 1A70     	 strb r2,[r3]
+ 450:../probe_scope.c ****                          ProbeScope_SampleChAll();                                  // Get the firs
+ 716              	 .loc 1 450 0
+ 717 013c FFF7FEFF 	 bl ProbeScope_SampleChAll
+ 451:../probe_scope.c ****                          ProbeScope_SamplePosNext();
+ 718              	 .loc 1 451 0
+ 719 0140 FFF7FEFF 	 bl ProbeScope_SamplePosNext
+ 452:../probe_scope.c ****                      }
+ 453:../probe_scope.c ****                  }
+ 454:../probe_scope.c ****                  break;
+ 720              	 .loc 1 454 0
+ 721 0144 04E0     	 b .L23
+ 722              	.L41:
+ 723 0146 03E0     	 b .L23
+ 724              	.L27:
+ 455:../probe_scope.c ****                  
+ 456:../probe_scope.c ****             default:
+ 457:../probe_scope.c ****                  ProbeScope_State = PROBE_SCOPE_STATE_START;
+ 725              	 .loc 1 457 0
+ 726 0148 044B     	 ldr r3,.L42+8
+ 727 014a 0022     	 mov r2,#0
+ 728 014c 1A70     	 strb r2,[r3]
+ 458:../probe_scope.c ****                  break;
+ 729              	 .loc 1 458 0
+ 730 014e C046     	 mov r8,r8
+ 731              	.L23:
+ 459:../probe_scope.c ****         }
+ 460:../probe_scope.c ****     }
+ 461:../probe_scope.c **** }
+ 732              	 .loc 1 461 0
+ 733 0150 BD46     	 mov sp,r7
+ 734              	 
+ 735 0152 80BD     	 pop {r7,pc}
+ 736              	.L43:
+ 737              	 .align 2
+ 738              	.L42:
+ 739 0154 00000000 	 .word ProbeScope_SamplingClkDivCtr
+ 740 0158 00000000 	 .word ProbeScope_SamplingClkDiv
+ 741 015c 00000000 	 .word ProbeScope_State
+ 742 0160 00000000 	 .word ProbeScope_DataRdyFlag
+ 743 0164 00000000 	 .word ProbeScope_TrigFlag
+ 744 0168 00000000 	 .word ProbeScope_SampleIxPrev
+ 745 016c 00000000 	 .word ProbeScope_SampleIxCur
+ 746 0170 00000000 	 .word ProbeScope_TrigHoldOffCtr
+ 747 0174 00000000 	 .word ProbeScope_SamplesPostTrigCtr
+ 748 0178 00000000 	 .word ProbeScope_TrigDispPos
+ 749 017c 00000000 	 .word ProbeScope_SamplesPreTrigCtr
+ 750 0180 E6030000 	 .word 998
+ 751 0184 00000000 	 .word ProbeScope_Mode
+ 752 0188 00000000 	 .word ProbeScope_TrigHoldOff
+ 753              	 .cfi_endproc
+ 754              	.LFE4:
+ 756              	 .section .text.ProbeScope_SampleChAll,"ax",%progbits
+ 757              	 .align 2
+ 758              	 .code 16
+ 759              	 .thumb_func
+ 761              	ProbeScope_SampleChAll:
+ 762              	.LFB5:
+ 462:../probe_scope.c **** 
+ 463:../probe_scope.c **** /*
+ 464:../probe_scope.c **** ***************************************************************************************************
+ 465:../probe_scope.c **** *                                              ProbeScope_SampleChAll()
+ 466:../probe_scope.c **** *
+ 467:../probe_scope.c **** * Description: This function is called to get a sample from all the enabled channels
+ 468:../probe_scope.c **** *
+ 469:../probe_scope.c **** * Arguments  : none
+ 470:../probe_scope.c **** * Returns    : none
+ 471:../probe_scope.c **** ***************************************************************************************************
+ 472:../probe_scope.c **** */
+ 473:../probe_scope.c **** 
+ 474:../probe_scope.c **** static  void  ProbeScope_SampleChAll (void)
+ 475:../probe_scope.c **** {
+ 763              	 .loc 1 475 0
+ 764              	 .cfi_startproc
+ 765 0000 80B5     	 push {r7,lr}
+ 766              	.LCFI11:
+ 767              	 .cfi_def_cfa_offset 8
+ 768              	 .cfi_offset 7,-8
+ 769              	 .cfi_offset 14,-4
+ 770 0002 00AF     	 add r7,sp,#0
+ 771              	.LCFI12:
+ 772              	 .cfi_def_cfa_register 7
+ 476:../probe_scope.c ****     ProbeScope_SampleCh(&ProbeScope_Ch1);
+ 773              	 .loc 1 476 0
+ 774 0004 044B     	 ldr r3,.L45
+ 775 0006 181C     	 mov r0,r3
+ 776 0008 FFF7FEFF 	 bl ProbeScope_SampleCh
+ 477:../probe_scope.c **** 
+ 478:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 2
+ 479:../probe_scope.c ****     ProbeScope_SampleCh(&ProbeScope_Ch2);
+ 777              	 .loc 1 479 0
+ 778 000c 034B     	 ldr r3,.L45+4
+ 779 000e 181C     	 mov r0,r3
+ 780 0010 FFF7FEFF 	 bl ProbeScope_SampleCh
+ 480:../probe_scope.c **** #endif
+ 481:../probe_scope.c **** 
+ 482:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 3                     
+ 483:../probe_scope.c ****     ProbeScope_SampleCh(&ProbeScope_Ch3);
+ 484:../probe_scope.c **** #endif
+ 485:../probe_scope.c **** 
+ 486:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 4                     
+ 487:../probe_scope.c ****     ProbeScope_SampleCh(&ProbeScope_Ch4);
+ 488:../probe_scope.c **** #endif                     
+ 489:../probe_scope.c **** 
+ 490:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 5
+ 491:../probe_scope.c ****     ProbeScope_SampleCh(&ProbeScope_Ch5);
+ 492:../probe_scope.c **** #endif
+ 493:../probe_scope.c **** 
+ 494:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 6                     
+ 495:../probe_scope.c ****     ProbeScope_SampleCh(&ProbeScope_Ch6);
+ 496:../probe_scope.c **** #endif
+ 497:../probe_scope.c **** 
+ 498:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 7                     
+ 499:../probe_scope.c ****     ProbeScope_SampleCh(&ProbeScope_Ch7);
+ 500:../probe_scope.c **** #endif                     
+ 501:../probe_scope.c **** 
+ 502:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 8                     
+ 503:../probe_scope.c ****     ProbeScope_SampleCh(&ProbeScope_Ch8);
+ 504:../probe_scope.c **** #endif                     
+ 505:../probe_scope.c **** }
+ 781              	 .loc 1 505 0
+ 782 0014 BD46     	 mov sp,r7
+ 783              	 
+ 784 0016 80BD     	 pop {r7,pc}
+ 785              	.L46:
+ 786              	 .align 2
+ 787              	.L45:
+ 788 0018 00000000 	 .word ProbeScope_Ch1
+ 789 001c 00000000 	 .word ProbeScope_Ch2
+ 790              	 .cfi_endproc
+ 791              	.LFE5:
+ 793              	 .section .text.ProbeScope_SampleCh,"ax",%progbits
+ 794              	 .align 2
+ 795              	 .code 16
+ 796              	 .thumb_func
+ 798              	ProbeScope_SampleCh:
+ 799              	.LFB6:
+ 506:../probe_scope.c **** 
+ 507:../probe_scope.c **** /*
+ 508:../probe_scope.c **** ***************************************************************************************************
+ 509:../probe_scope.c **** *                                                   ProbeScope_SampleCh()
+ 510:../probe_scope.c **** *
+ 511:../probe_scope.c **** * Description: This function is called to read a sample from the desired channel and store it in it
+ 512:../probe_scope.c **** *
+ 513:../probe_scope.c **** * Arguments  : p_ch      is a pointer to the desired channel to sample
+ 514:../probe_scope.c **** * Returns    : none
+ 515:../probe_scope.c **** ***************************************************************************************************
+ 516:../probe_scope.c **** */
+ 517:../probe_scope.c **** 
+ 518:../probe_scope.c **** static  void  ProbeScope_SampleCh (PROBE_SCOPE_CH  *p_ch)
+ 519:../probe_scope.c **** {
+ 800              	 .loc 1 519 0
+ 801              	 .cfi_startproc
+ 802 0000 80B5     	 push {r7,lr}
+ 803              	.LCFI13:
+ 804              	 .cfi_def_cfa_offset 8
+ 805              	 .cfi_offset 7,-8
+ 806              	 .cfi_offset 14,-4
+ 807 0002 84B0     	 sub sp,sp,#16
+ 808              	.LCFI14:
+ 809              	 .cfi_def_cfa_offset 24
+ 810 0004 00AF     	 add r7,sp,#0
+ 811              	.LCFI15:
+ 812              	 .cfi_def_cfa_register 7
+ 813 0006 7860     	 str r0,[r7,#4]
+ 520:../probe_scope.c ****     PROBE_SCOPE_CH_SAMPLE   msk;                                    // Mask used to select desired 
+ 521:../probe_scope.c ****     PROBE_SCOPE_CH_SAMPLE  *p_sample;                               // Pointer to where the sample 
+ 522:../probe_scope.c **** 
+ 523:../probe_scope.c **** 
+ 524:../probe_scope.c ****     if (p_ch->En == 1) {
+ 814              	 .loc 1 524 0
+ 815 0008 7B68     	 ldr r3,[r7,#4]
+ 816 000a 1B68     	 ldr r3,[r3]
+ 817 000c 012B     	 cmp r3,#1
+ 818 000e 00D0     	 beq .LCB621
+ 819 0010 EEE0     	 b .L47
+ 820              	.LCB621:
+ 525:../probe_scope.c ****         p_sample = &p_ch->Samples[ProbeScope_SampleIxCur];          // Point to current position in
+ 821              	 .loc 1 525 0
+ 822 0012 794B     	 ldr r3,.L75
+ 823 0014 1B68     	 ldr r3,[r3]
+ 824 0016 0633     	 add r3,r3,#6
+ 825 0018 9B00     	 lsl r3,r3,#2
+ 826 001a 7A68     	 ldr r2,[r7,#4]
+ 827 001c D318     	 add r3,r2,r3
+ 828 001e FB60     	 str r3,[r7,#12]
+ 526:../probe_scope.c ****         switch (p_ch->DataType) {
+ 829              	 .loc 1 526 0
+ 830 0020 7B68     	 ldr r3,[r7,#4]
+ 831 0022 1B79     	 ldrb r3,[r3,#4]
+ 832 0024 062B     	 cmp r3,#6
+ 833 0026 00D9     	 bls .LCB632
+ 834 0028 E2E0     	 b .L47
+ 835              	.LCB632:
+ 836 002a 9A00     	 lsl r2,r3,#2
+ 837 002c 734B     	 ldr r3,.L75+4
+ 838 002e D318     	 add r3,r2,r3
+ 839 0030 1B68     	 ldr r3,[r3]
+ 840 0032 9F46     	 mov pc,r3
+ 841              	 .section .rodata.ProbeScope_SampleCh,"a",%progbits
+ 842              	 .align 2
+ 843              	.L50:
+ 844 0000 34000000 	 .word .L49
+ 845 0004 80000000 	 .word .L51
+ 846 0008 CE000000 	 .word .L52
+ 847 000c 1A010000 	 .word .L53
+ 848 0010 68010000 	 .word .L54
+ 849 0014 A6010000 	 .word .L55
+ 850 0018 E4010000 	 .word .L56
+ 851              	 .section .text.ProbeScope_SampleCh
+ 852              	.L49:
+ 527:../probe_scope.c ****             case PROBE_SCOPE_INT08U:
+ 528:../probe_scope.c ****                  if (p_ch->BitEn == 0) {
+ 853              	 .loc 1 528 0
+ 854 0034 7B68     	 ldr r3,[r7,#4]
+ 855 0036 9B68     	 ldr r3,[r3,#8]
+ 856 0038 002B     	 cmp r3,#0
+ 857 003a 05D1     	 bne .L57
+ 529:../probe_scope.c ****                      p_sample->Val08U     = *(CPU_INT08U *)p_ch->DataAddr;
+ 858              	 .loc 1 529 0
+ 859 003c 7B68     	 ldr r3,[r7,#4]
+ 860 003e 1B69     	 ldr r3,[r3,#16]
+ 861 0040 1A78     	 ldrb r2,[r3]
+ 862 0042 FB68     	 ldr r3,[r7,#12]
+ 863 0044 1A70     	 strb r2,[r3]
+ 864 0046 1AE0     	 b .L58
+ 865              	.L57:
+ 530:../probe_scope.c ****                  } else {
+ 531:../probe_scope.c ****                      msk.Val08U           =  (CPU_INT08U)1 << p_ch->BitSel;
+ 866              	 .loc 1 531 0
+ 867 0048 7B68     	 ldr r3,[r7,#4]
+ 868 004a 1B7B     	 ldrb r3,[r3,#12]
+ 869 004c 1A1C     	 mov r2,r3
+ 870 004e 0123     	 mov r3,#1
+ 871 0050 9340     	 lsl r3,r3,r2
+ 872 0052 DAB2     	 uxtb r2,r3
+ 873 0054 0823     	 mov r3,#8
+ 874 0056 FB18     	 add r3,r7,r3
+ 875 0058 1A70     	 strb r2,[r3]
+ 532:../probe_scope.c ****                      if (*(CPU_INT08U *)p_ch->DataAddr & msk.Val08U) {
+ 876              	 .loc 1 532 0
+ 877 005a 7B68     	 ldr r3,[r7,#4]
+ 878 005c 1B69     	 ldr r3,[r3,#16]
+ 879 005e 1B78     	 ldrb r3,[r3]
+ 880 0060 0822     	 mov r2,#8
+ 881 0062 BA18     	 add r2,r7,r2
+ 882 0064 1278     	 ldrb r2,[r2]
+ 883 0066 1340     	 and r3,r2
+ 884 0068 DBB2     	 uxtb r3,r3
+ 885 006a 002B     	 cmp r3,#0
+ 886 006c 03D0     	 beq .L59
+ 533:../probe_scope.c ****                          p_sample->Val08U = 1;
+ 887              	 .loc 1 533 0
+ 888 006e FB68     	 ldr r3,[r7,#12]
+ 889 0070 0122     	 mov r2,#1
+ 890 0072 1A70     	 strb r2,[r3]
+ 891 0074 03E0     	 b .L58
+ 892              	.L59:
+ 534:../probe_scope.c ****                      } else {
+ 535:../probe_scope.c ****                          p_sample->Val08U = 0;
+ 893              	 .loc 1 535 0
+ 894 0076 FB68     	 ldr r3,[r7,#12]
+ 895 0078 0022     	 mov r2,#0
+ 896 007a 1A70     	 strb r2,[r3]
+ 536:../probe_scope.c ****                      }
+ 537:../probe_scope.c ****                  }
+ 538:../probe_scope.c ****                  break;
+ 897              	 .loc 1 538 0
+ 898 007c B8E0     	 b .L47
+ 899              	.L58:
+ 900 007e B7E0     	 b .L47
+ 901              	.L51:
+ 539:../probe_scope.c ****                                   
+ 540:../probe_scope.c ****             case PROBE_SCOPE_INT08S:
+ 541:../probe_scope.c ****                  if (p_ch->BitEn == 0) {
+ 902              	 .loc 1 541 0
+ 903 0080 7B68     	 ldr r3,[r7,#4]
+ 904 0082 9B68     	 ldr r3,[r3,#8]
+ 905 0084 002B     	 cmp r3,#0
+ 906 0086 05D1     	 bne .L60
+ 542:../probe_scope.c ****                      p_sample->Val08S     = *(CPU_INT08S *)p_ch->DataAddr;
+ 907              	 .loc 1 542 0
+ 908 0088 7B68     	 ldr r3,[r7,#4]
+ 909 008a 1B69     	 ldr r3,[r3,#16]
+ 910 008c 1A78     	 ldrb r2,[r3]
+ 911 008e FB68     	 ldr r3,[r7,#12]
+ 912 0090 1A70     	 strb r2,[r3]
+ 913 0092 1BE0     	 b .L61
+ 914              	.L60:
+ 543:../probe_scope.c ****                  } else {
+ 544:../probe_scope.c ****                      msk.Val08S           =  (CPU_INT08S)1 << p_ch->BitSel;
+ 915              	 .loc 1 544 0
+ 916 0094 7B68     	 ldr r3,[r7,#4]
+ 917 0096 1B7B     	 ldrb r3,[r3,#12]
+ 918 0098 1A1C     	 mov r2,r3
+ 919 009a 0123     	 mov r3,#1
+ 920 009c 9340     	 lsl r3,r3,r2
+ 921 009e DAB2     	 uxtb r2,r3
+ 922 00a0 0823     	 mov r3,#8
+ 923 00a2 FB18     	 add r3,r7,r3
+ 924 00a4 1A70     	 strb r2,[r3]
+ 545:../probe_scope.c ****                      if (*(CPU_INT08S *)p_ch->DataAddr & msk.Val08S) {
+ 925              	 .loc 1 545 0
+ 926 00a6 7B68     	 ldr r3,[r7,#4]
+ 927 00a8 1B69     	 ldr r3,[r3,#16]
+ 928 00aa 1978     	 ldrb r1,[r3]
+ 929 00ac 0823     	 mov r3,#8
+ 930 00ae FB18     	 add r3,r7,r3
+ 931 00b0 1A78     	 ldrb r2,[r3]
+ 932 00b2 0B1C     	 add r3,r1,#0
+ 933 00b4 1340     	 and r3,r2
+ 934 00b6 DBB2     	 uxtb r3,r3
+ 935 00b8 002B     	 cmp r3,#0
+ 936 00ba 03D0     	 beq .L62
+ 546:../probe_scope.c ****                          p_sample->Val08S = 1;
+ 937              	 .loc 1 546 0
+ 938 00bc FB68     	 ldr r3,[r7,#12]
+ 939 00be 0122     	 mov r2,#1
+ 940 00c0 1A70     	 strb r2,[r3]
+ 941 00c2 03E0     	 b .L61
+ 942              	.L62:
+ 547:../probe_scope.c ****                      } else {
+ 548:../probe_scope.c ****                          p_sample->Val08S = 0;
+ 943              	 .loc 1 548 0
+ 944 00c4 FB68     	 ldr r3,[r7,#12]
+ 945 00c6 0022     	 mov r2,#0
+ 946 00c8 1A70     	 strb r2,[r3]
+ 549:../probe_scope.c ****                      }
+ 550:../probe_scope.c ****                  }
+ 551:../probe_scope.c ****                  break;
+ 947              	 .loc 1 551 0
+ 948 00ca 91E0     	 b .L47
+ 949              	.L61:
+ 950              	 .loc 1 551 0 is_stmt 0 discriminator 2
+ 951 00cc 90E0     	 b .L47
+ 952              	.L52:
+ 552:../probe_scope.c ****                                   
+ 553:../probe_scope.c **** #if PROBE_SCOPE_16_BIT_EN > 0                                   
+ 554:../probe_scope.c ****             case PROBE_SCOPE_INT16U:
+ 555:../probe_scope.c ****                  if (p_ch->BitEn == 0) {
+ 953              	 .loc 1 555 0 is_stmt 1
+ 954 00ce 7B68     	 ldr r3,[r7,#4]
+ 955 00d0 9B68     	 ldr r3,[r3,#8]
+ 956 00d2 002B     	 cmp r3,#0
+ 957 00d4 05D1     	 bne .L63
+ 556:../probe_scope.c ****                      p_sample->Val16U     = *(CPU_INT16U *)p_ch->DataAddr;
+ 958              	 .loc 1 556 0
+ 959 00d6 7B68     	 ldr r3,[r7,#4]
+ 960 00d8 1B69     	 ldr r3,[r3,#16]
+ 961 00da 1A88     	 ldrh r2,[r3]
+ 962 00dc FB68     	 ldr r3,[r7,#12]
+ 963 00de 1A80     	 strh r2,[r3]
+ 964 00e0 1AE0     	 b .L64
+ 965              	.L63:
+ 557:../probe_scope.c ****                  } else {
+ 558:../probe_scope.c ****                      msk.Val16U           =  (CPU_INT16U)1 << p_ch->BitSel;
+ 966              	 .loc 1 558 0
+ 967 00e2 7B68     	 ldr r3,[r7,#4]
+ 968 00e4 1B7B     	 ldrb r3,[r3,#12]
+ 969 00e6 1A1C     	 mov r2,r3
+ 970 00e8 0123     	 mov r3,#1
+ 971 00ea 9340     	 lsl r3,r3,r2
+ 972 00ec 9AB2     	 uxth r2,r3
+ 973 00ee 0823     	 mov r3,#8
+ 974 00f0 FB18     	 add r3,r7,r3
+ 975 00f2 1A80     	 strh r2,[r3]
+ 559:../probe_scope.c ****                      if (*(CPU_INT16U *)p_ch->DataAddr & msk.Val16U) {
+ 976              	 .loc 1 559 0
+ 977 00f4 7B68     	 ldr r3,[r7,#4]
+ 978 00f6 1B69     	 ldr r3,[r3,#16]
+ 979 00f8 1B88     	 ldrh r3,[r3]
+ 980 00fa 0822     	 mov r2,#8
+ 981 00fc BA18     	 add r2,r7,r2
+ 982 00fe 1288     	 ldrh r2,[r2]
+ 983 0100 1340     	 and r3,r2
+ 984 0102 9BB2     	 uxth r3,r3
+ 985 0104 002B     	 cmp r3,#0
+ 986 0106 03D0     	 beq .L65
+ 560:../probe_scope.c ****                          p_sample->Val16U = 1;
+ 987              	 .loc 1 560 0
+ 988 0108 FB68     	 ldr r3,[r7,#12]
+ 989 010a 0122     	 mov r2,#1
+ 990 010c 1A80     	 strh r2,[r3]
+ 991 010e 03E0     	 b .L64
+ 992              	.L65:
+ 561:../probe_scope.c ****                      } else {
+ 562:../probe_scope.c ****                          p_sample->Val16U = 0;
+ 993              	 .loc 1 562 0
+ 994 0110 FB68     	 ldr r3,[r7,#12]
+ 995 0112 0022     	 mov r2,#0
+ 996 0114 1A80     	 strh r2,[r3]
+ 563:../probe_scope.c ****                      }
+ 564:../probe_scope.c ****                  }
+ 565:../probe_scope.c ****                  break;
+ 997              	 .loc 1 565 0
+ 998 0116 6BE0     	 b .L47
+ 999              	.L64:
+ 1000              	 .loc 1 565 0 is_stmt 0 discriminator 3
+ 1001 0118 6AE0     	 b .L47
+ 1002              	.L53:
+ 566:../probe_scope.c ****                                   
+ 567:../probe_scope.c ****             case PROBE_SCOPE_INT16S:
+ 568:../probe_scope.c ****                  if (p_ch->BitEn == 0) {
+ 1003              	 .loc 1 568 0 is_stmt 1
+ 1004 011a 7B68     	 ldr r3,[r7,#4]
+ 1005 011c 9B68     	 ldr r3,[r3,#8]
+ 1006 011e 002B     	 cmp r3,#0
+ 1007 0120 05D1     	 bne .L66
+ 569:../probe_scope.c ****                      p_sample->Val16S     = *(CPU_INT16S *)p_ch->DataAddr;
+ 1008              	 .loc 1 569 0
+ 1009 0122 7B68     	 ldr r3,[r7,#4]
+ 1010 0124 1B69     	 ldr r3,[r3,#16]
+ 1011 0126 1A88     	 ldrh r2,[r3]
+ 1012 0128 FB68     	 ldr r3,[r7,#12]
+ 1013 012a 1A80     	 strh r2,[r3]
+ 1014 012c 1BE0     	 b .L67
+ 1015              	.L66:
+ 570:../probe_scope.c ****                  } else {
+ 571:../probe_scope.c ****                      msk.Val16S           =  (CPU_INT16S)1 << p_ch->BitSel;
+ 1016              	 .loc 1 571 0
+ 1017 012e 7B68     	 ldr r3,[r7,#4]
+ 1018 0130 1B7B     	 ldrb r3,[r3,#12]
+ 1019 0132 1A1C     	 mov r2,r3
+ 1020 0134 0123     	 mov r3,#1
+ 1021 0136 9340     	 lsl r3,r3,r2
+ 1022 0138 9AB2     	 uxth r2,r3
+ 1023 013a 0823     	 mov r3,#8
+ 1024 013c FB18     	 add r3,r7,r3
+ 1025 013e 1A80     	 strh r2,[r3]
+ 572:../probe_scope.c ****                      if (*(CPU_INT16S *)p_ch->DataAddr & msk.Val16S) {
+ 1026              	 .loc 1 572 0
+ 1027 0140 7B68     	 ldr r3,[r7,#4]
+ 1028 0142 1B69     	 ldr r3,[r3,#16]
+ 1029 0144 1988     	 ldrh r1,[r3]
+ 1030 0146 0823     	 mov r3,#8
+ 1031 0148 FB18     	 add r3,r7,r3
+ 1032 014a 1A88     	 ldrh r2,[r3]
+ 1033 014c 0B1C     	 add r3,r1,#0
+ 1034 014e 1340     	 and r3,r2
+ 1035 0150 9BB2     	 uxth r3,r3
+ 1036 0152 002B     	 cmp r3,#0
+ 1037 0154 03D0     	 beq .L68
+ 573:../probe_scope.c ****                          p_sample->Val16S = 1;
+ 1038              	 .loc 1 573 0
+ 1039 0156 FB68     	 ldr r3,[r7,#12]
+ 1040 0158 0122     	 mov r2,#1
+ 1041 015a 1A80     	 strh r2,[r3]
+ 1042 015c 03E0     	 b .L67
+ 1043              	.L68:
+ 574:../probe_scope.c ****                      } else {
+ 575:../probe_scope.c ****                          p_sample->Val16S = 0;
+ 1044              	 .loc 1 575 0
+ 1045 015e FB68     	 ldr r3,[r7,#12]
+ 1046 0160 0022     	 mov r2,#0
+ 1047 0162 1A80     	 strh r2,[r3]
+ 576:../probe_scope.c ****                      }
+ 577:../probe_scope.c ****                  }
+ 578:../probe_scope.c ****                  break;
+ 1048              	 .loc 1 578 0
+ 1049 0164 44E0     	 b .L47
+ 1050              	.L67:
+ 1051              	 .loc 1 578 0 is_stmt 0 discriminator 4
+ 1052 0166 43E0     	 b .L47
+ 1053              	.L54:
+ 579:../probe_scope.c **** #endif
+ 580:../probe_scope.c **** 
+ 581:../probe_scope.c **** #if PROBE_SCOPE_32_BIT_EN > 0                                   
+ 582:../probe_scope.c ****             case PROBE_SCOPE_INT32U:
+ 583:../probe_scope.c ****                  if (p_ch->BitEn == 0) {
+ 1054              	 .loc 1 583 0 is_stmt 1
+ 1055 0168 7B68     	 ldr r3,[r7,#4]
+ 1056 016a 9B68     	 ldr r3,[r3,#8]
+ 1057 016c 002B     	 cmp r3,#0
+ 1058 016e 05D1     	 bne .L69
+ 584:../probe_scope.c ****                      p_sample->Val32U     = *(CPU_INT32U *)p_ch->DataAddr;
+ 1059              	 .loc 1 584 0
+ 1060 0170 7B68     	 ldr r3,[r7,#4]
+ 1061 0172 1B69     	 ldr r3,[r3,#16]
+ 1062 0174 1A68     	 ldr r2,[r3]
+ 1063 0176 FB68     	 ldr r3,[r7,#12]
+ 1064 0178 1A60     	 str r2,[r3]
+ 1065 017a 13E0     	 b .L70
+ 1066              	.L69:
+ 585:../probe_scope.c ****                  } else {
+ 586:../probe_scope.c ****                      msk.Val32U           =  (CPU_INT32U)1 << p_ch->BitSel;
+ 1067              	 .loc 1 586 0
+ 1068 017c 7B68     	 ldr r3,[r7,#4]
+ 1069 017e 1B7B     	 ldrb r3,[r3,#12]
+ 1070 0180 1A1C     	 mov r2,r3
+ 1071 0182 0123     	 mov r3,#1
+ 1072 0184 9340     	 lsl r3,r3,r2
+ 1073 0186 BB60     	 str r3,[r7,#8]
+ 587:../probe_scope.c ****                      if (*(CPU_INT32U *)p_ch->DataAddr & msk.Val32U) {
+ 1074              	 .loc 1 587 0
+ 1075 0188 7B68     	 ldr r3,[r7,#4]
+ 1076 018a 1B69     	 ldr r3,[r3,#16]
+ 1077 018c 1B68     	 ldr r3,[r3]
+ 1078 018e BA68     	 ldr r2,[r7,#8]
+ 1079 0190 1340     	 and r3,r2
+ 1080 0192 03D0     	 beq .L71
+ 588:../probe_scope.c ****                          p_sample->Val32U = 1;
+ 1081              	 .loc 1 588 0
+ 1082 0194 FB68     	 ldr r3,[r7,#12]
+ 1083 0196 0122     	 mov r2,#1
+ 1084 0198 1A60     	 str r2,[r3]
+ 1085 019a 03E0     	 b .L70
+ 1086              	.L71:
+ 589:../probe_scope.c ****                      } else {
+ 590:../probe_scope.c ****                          p_sample->Val32U = 0;
+ 1087              	 .loc 1 590 0
+ 1088 019c FB68     	 ldr r3,[r7,#12]
+ 1089 019e 0022     	 mov r2,#0
+ 1090 01a0 1A60     	 str r2,[r3]
+ 591:../probe_scope.c ****                      }
+ 592:../probe_scope.c ****                  }
+ 593:../probe_scope.c ****                  break;
+ 1091              	 .loc 1 593 0
+ 1092 01a2 25E0     	 b .L47
+ 1093              	.L70:
+ 1094              	 .loc 1 593 0 is_stmt 0 discriminator 5
+ 1095 01a4 24E0     	 b .L47
+ 1096              	.L55:
+ 594:../probe_scope.c ****                                   
+ 595:../probe_scope.c ****             case PROBE_SCOPE_INT32S:
+ 596:../probe_scope.c ****                  if (p_ch->BitEn == 0) {
+ 1097              	 .loc 1 596 0 is_stmt 1
+ 1098 01a6 7B68     	 ldr r3,[r7,#4]
+ 1099 01a8 9B68     	 ldr r3,[r3,#8]
+ 1100 01aa 002B     	 cmp r3,#0
+ 1101 01ac 05D1     	 bne .L72
+ 597:../probe_scope.c ****                      p_sample->Val32S     = *(CPU_INT32S *)p_ch->DataAddr;
+ 1102              	 .loc 1 597 0
+ 1103 01ae 7B68     	 ldr r3,[r7,#4]
+ 1104 01b0 1B69     	 ldr r3,[r3,#16]
+ 1105 01b2 1A68     	 ldr r2,[r3]
+ 1106 01b4 FB68     	 ldr r3,[r7,#12]
+ 1107 01b6 1A60     	 str r2,[r3]
+ 1108 01b8 13E0     	 b .L73
+ 1109              	.L72:
+ 598:../probe_scope.c ****                  } else {
+ 599:../probe_scope.c ****                      msk.Val32S           =  (CPU_INT32S)1 << p_ch->BitSel;
+ 1110              	 .loc 1 599 0
+ 1111 01ba 7B68     	 ldr r3,[r7,#4]
+ 1112 01bc 1B7B     	 ldrb r3,[r3,#12]
+ 1113 01be 1A1C     	 mov r2,r3
+ 1114 01c0 0123     	 mov r3,#1
+ 1115 01c2 9340     	 lsl r3,r3,r2
+ 1116 01c4 BB60     	 str r3,[r7,#8]
+ 600:../probe_scope.c ****                      if (*(CPU_INT32S *)p_ch->DataAddr & msk.Val32S) {
+ 1117              	 .loc 1 600 0
+ 1118 01c6 7B68     	 ldr r3,[r7,#4]
+ 1119 01c8 1B69     	 ldr r3,[r3,#16]
+ 1120 01ca 1B68     	 ldr r3,[r3]
+ 1121 01cc BA68     	 ldr r2,[r7,#8]
+ 1122 01ce 1340     	 and r3,r2
+ 1123 01d0 03D0     	 beq .L74
+ 601:../probe_scope.c ****                          p_sample->Val32S = 1;
+ 1124              	 .loc 1 601 0
+ 1125 01d2 FB68     	 ldr r3,[r7,#12]
+ 1126 01d4 0122     	 mov r2,#1
+ 1127 01d6 1A60     	 str r2,[r3]
+ 1128 01d8 03E0     	 b .L73
+ 1129              	.L74:
+ 602:../probe_scope.c ****                      } else {
+ 603:../probe_scope.c ****                          p_sample->Val32S = 0;
+ 1130              	 .loc 1 603 0
+ 1131 01da FB68     	 ldr r3,[r7,#12]
+ 1132 01dc 0022     	 mov r2,#0
+ 1133 01de 1A60     	 str r2,[r3]
+ 604:../probe_scope.c ****                      }
+ 605:../probe_scope.c ****                  }
+ 606:../probe_scope.c ****                  break;
+ 1134              	 .loc 1 606 0
+ 1135 01e0 06E0     	 b .L47
+ 1136              	.L73:
+ 1137              	 .loc 1 606 0 is_stmt 0 discriminator 6
+ 1138 01e2 05E0     	 b .L47
+ 1139              	.L56:
+ 607:../probe_scope.c ****                                   
+ 608:../probe_scope.c ****             case PROBE_SCOPE_FP32:
+ 609:../probe_scope.c ****                  p_sample->ValFP32  = *(CPU_FP32   *)p_ch->DataAddr;
+ 1140              	 .loc 1 609 0 is_stmt 1
+ 1141 01e4 7B68     	 ldr r3,[r7,#4]
+ 1142 01e6 1B69     	 ldr r3,[r3,#16]
+ 1143 01e8 1A68     	 ldr r2,[r3]
+ 1144 01ea FB68     	 ldr r3,[r7,#12]
+ 1145 01ec 1A60     	 str r2,[r3]
+ 610:../probe_scope.c ****                  break;
+ 1146              	 .loc 1 610 0
+ 1147 01ee C046     	 mov r8,r8
+ 1148              	.L47:
+ 611:../probe_scope.c **** #endif
+ 612:../probe_scope.c ****         }                          
+ 613:../probe_scope.c ****     }
+ 614:../probe_scope.c **** }
+ 1149              	 .loc 1 614 0
+ 1150 01f0 BD46     	 mov sp,r7
+ 1151 01f2 04B0     	 add sp,sp,#16
+ 1152              	 
+ 1153 01f4 80BD     	 pop {r7,pc}
+ 1154              	.L76:
+ 1155 01f6 C046     	 .align 2
+ 1156              	.L75:
+ 1157 01f8 00000000 	 .word ProbeScope_SampleIxCur
+ 1158 01fc 00000000 	 .word .L50
+ 1159              	 .cfi_endproc
+ 1160              	.LFE6:
+ 1162              	 .section .text.ProbeScope_SamplePosNext,"ax",%progbits
+ 1163              	 .align 2
+ 1164              	 .code 16
+ 1165              	 .thumb_func
+ 1167              	ProbeScope_SamplePosNext:
+ 1168              	.LFB7:
+ 615:../probe_scope.c **** 
+ 616:../probe_scope.c **** 
+ 617:../probe_scope.c **** /*
+ 618:../probe_scope.c **** ***************************************************************************************************
+ 619:../probe_scope.c **** *                                         Position Sample Index for next sample
+ 620:../probe_scope.c **** *
+ 621:../probe_scope.c **** * Description: 
+ 622:../probe_scope.c **** *
+ 623:../probe_scope.c **** * Arguments  : none
+ 624:../probe_scope.c **** * Returns    : none
+ 625:../probe_scope.c **** ***************************************************************************************************
+ 626:../probe_scope.c **** */
+ 627:../probe_scope.c **** 
+ 628:../probe_scope.c **** static  void  ProbeScope_SamplePosNext (void)
+ 629:../probe_scope.c **** {
+ 1169              	 .loc 1 629 0
+ 1170              	 .cfi_startproc
+ 1171 0000 80B5     	 push {r7,lr}
+ 1172              	.LCFI16:
+ 1173              	 .cfi_def_cfa_offset 8
+ 1174              	 .cfi_offset 7,-8
+ 1175              	 .cfi_offset 14,-4
+ 1176 0002 00AF     	 add r7,sp,#0
+ 1177              	.LCFI17:
+ 1178              	 .cfi_def_cfa_register 7
+ 630:../probe_scope.c ****     ProbeScope_SampleIxPrev = ProbeScope_SampleIxCur;              // Update the position of the pr
+ 1179              	 .loc 1 630 0
+ 1180 0004 094B     	 ldr r3,.L79
+ 1181 0006 1A68     	 ldr r2,[r3]
+ 1182 0008 094B     	 ldr r3,.L79+4
+ 1183 000a 1A60     	 str r2,[r3]
+ 631:../probe_scope.c ****     ProbeScope_SampleIxCur++;                                      // Position to where next sample
+ 1184              	 .loc 1 631 0
+ 1185 000c 074B     	 ldr r3,.L79
+ 1186 000e 1B68     	 ldr r3,[r3]
+ 1187 0010 5A1C     	 add r2,r3,#1
+ 1188 0012 064B     	 ldr r3,.L79
+ 1189 0014 1A60     	 str r2,[r3]
+ 632:../probe_scope.c ****     if (ProbeScope_SampleIxCur >= PROBE_SCOPE_MAX_SAMPLES) {       // See if we need to wrap around
+ 1190              	 .loc 1 632 0
+ 1191 0016 054B     	 ldr r3,.L79
+ 1192 0018 1B68     	 ldr r3,[r3]
+ 1193 001a 064A     	 ldr r2,.L79+8
+ 1194 001c 9342     	 cmp r3,r2
+ 1195 001e 02D9     	 bls .L77
+ 633:../probe_scope.c ****         ProbeScope_SampleIxCur = 0;                                // yes
+ 1196              	 .loc 1 633 0
+ 1197 0020 024B     	 ldr r3,.L79
+ 1198 0022 0022     	 mov r2,#0
+ 1199 0024 1A60     	 str r2,[r3]
+ 1200              	.L77:
+ 634:../probe_scope.c ****     }
+ 635:../probe_scope.c **** }
+ 1201              	 .loc 1 635 0
+ 1202 0026 BD46     	 mov sp,r7
+ 1203              	 
+ 1204 0028 80BD     	 pop {r7,pc}
+ 1205              	.L80:
+ 1206 002a C046     	 .align 2
+ 1207              	.L79:
+ 1208 002c 00000000 	 .word ProbeScope_SampleIxCur
+ 1209 0030 00000000 	 .word ProbeScope_SampleIxPrev
+ 1210 0034 E7030000 	 .word 999
+ 1211              	 .cfi_endproc
+ 1212              	.LFE7:
+ 1214              	 .global __aeabi_fcmplt
+ 1215              	 .global __aeabi_fcmple
+ 1216              	 .global __aeabi_fcmpge
+ 1217              	 .global __aeabi_fcmpgt
+ 1218              	 .section .text.ProbeScope_IsTrig,"ax",%progbits
+ 1219              	 .align 2
+ 1220              	 .code 16
+ 1221              	 .thumb_func
+ 1223              	ProbeScope_IsTrig:
+ 1224              	.LFB8:
+ 636:../probe_scope.c **** 
+ 637:../probe_scope.c **** /*
+ 638:../probe_scope.c **** ***************************************************************************************************
+ 639:../probe_scope.c **** *                                                    ProbeScope_IsTrig()
+ 640:../probe_scope.c **** *
+ 641:../probe_scope.c **** * Description: This function is called to detect whether the trigger channel sees the trigger condi
+ 642:../probe_scope.c **** *              The channel needs to be enabled as well.
+ 643:../probe_scope.c **** *              To trigger the sampling, we must see the proper slope and the trigger level must be 
+ 644:../probe_scope.c **** *
+ 645:../probe_scope.c **** * Arguments  : ch      is the channel number that will be used as the trigger channel.
+ 646:../probe_scope.c **** * Returns    : Sets ProbeScope_TrigFlag to 1 when a  trigger is detected
+ 647:../probe_scope.c **** *              Sets ProbeScope_TrigFlag to 0 when no trigger is detected
+ 648:../probe_scope.c **** ***************************************************************************************************
+ 649:../probe_scope.c **** */
+ 650:../probe_scope.c **** 
+ 651:../probe_scope.c **** static  void  ProbeScope_IsTrig (void)
+ 652:../probe_scope.c **** {
+ 1225              	 .loc 1 652 0
+ 1226              	 .cfi_startproc
+ 1227 0000 80B5     	 push {r7,lr}
+ 1228              	.LCFI18:
+ 1229              	 .cfi_def_cfa_offset 8
+ 1230              	 .cfi_offset 7,-8
+ 1231              	 .cfi_offset 14,-4
+ 1232 0002 84B0     	 sub sp,sp,#16
+ 1233              	.LCFI19:
+ 1234              	 .cfi_def_cfa_offset 24
+ 1235 0004 00AF     	 add r7,sp,#0
+ 1236              	.LCFI20:
+ 1237              	 .cfi_def_cfa_register 7
+ 653:../probe_scope.c ****     PROBE_SCOPE_CH          *p_ch;
+ 654:../probe_scope.c ****     PROBE_SCOPE_CH_SAMPLE   *p_sample_prev;
+ 655:../probe_scope.c ****     PROBE_SCOPE_CH_SAMPLE   *p_sample_cur;
+ 656:../probe_scope.c ****     
+ 657:../probe_scope.c **** 
+ 658:../probe_scope.c ****     switch (ProbeScope_TrigChSel) {
+ 1238              	 .loc 1 658 0
+ 1239 0006 BA4B     	 ldr r3,.L157
+ 1240 0008 1B78     	 ldrb r3,[r3]
+ 1241 000a 012B     	 cmp r3,#1
+ 1242 000c 02D0     	 beq .L83
+ 1243 000e 022B     	 cmp r3,#2
+ 1244 0010 03D0     	 beq .L84
+ 1245 0012 05E0     	 b .L155
+ 1246              	.L83:
+ 659:../probe_scope.c ****         case PROBE_SCOPE_CH1:
+ 660:../probe_scope.c ****              p_ch = &ProbeScope_Ch1;
+ 1247              	 .loc 1 660 0
+ 1248 0014 B74B     	 ldr r3,.L157+4
+ 1249 0016 FB60     	 str r3,[r7,#12]
+ 661:../probe_scope.c ****              break;
+ 1250              	 .loc 1 661 0
+ 1251 0018 08E0     	 b .L85
+ 1252              	.L84:
+ 662:../probe_scope.c ****              
+ 663:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 2
+ 664:../probe_scope.c ****         case PROBE_SCOPE_CH2:
+ 665:../probe_scope.c ****              p_ch = &ProbeScope_Ch2;
+ 1253              	 .loc 1 665 0
+ 1254 001a B74B     	 ldr r3,.L157+8
+ 1255 001c FB60     	 str r3,[r7,#12]
+ 666:../probe_scope.c ****              break;
+ 1256              	 .loc 1 666 0
+ 1257 001e 05E0     	 b .L85
+ 1258              	.L155:
+ 667:../probe_scope.c **** #endif
+ 668:../probe_scope.c ****              
+ 669:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 3
+ 670:../probe_scope.c ****         case PROBE_SCOPE_CH3:
+ 671:../probe_scope.c ****              p_ch = &ProbeScope_Ch3;
+ 672:../probe_scope.c ****              break;
+ 673:../probe_scope.c **** #endif             
+ 674:../probe_scope.c ****              
+ 675:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 4
+ 676:../probe_scope.c ****         case PROBE_SCOPE_CH4:
+ 677:../probe_scope.c ****              p_ch = &ProbeScope_Ch4;
+ 678:../probe_scope.c ****              break;
+ 679:../probe_scope.c **** #endif
+ 680:../probe_scope.c ****              
+ 681:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 5
+ 682:../probe_scope.c ****         case PROBE_SCOPE_CH5:
+ 683:../probe_scope.c ****              p_ch = &ProbeScope_Ch5;
+ 684:../probe_scope.c ****              break;
+ 685:../probe_scope.c **** #endif
+ 686:../probe_scope.c ****              
+ 687:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 6
+ 688:../probe_scope.c ****         case PROBE_SCOPE_CH6:
+ 689:../probe_scope.c ****              p_ch = &ProbeScope_Ch6;
+ 690:../probe_scope.c ****              break;
+ 691:../probe_scope.c **** #endif             
+ 692:../probe_scope.c ****              
+ 693:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 7
+ 694:../probe_scope.c ****         case PROBE_SCOPE_CH7:
+ 695:../probe_scope.c ****              p_ch = &ProbeScope_Ch7;
+ 696:../probe_scope.c ****              break;
+ 697:../probe_scope.c **** #endif
+ 698:../probe_scope.c ****              
+ 699:../probe_scope.c **** #if PROBE_SCOPE_MAX_CH >= 8
+ 700:../probe_scope.c ****         case PROBE_SCOPE_CH8:
+ 701:../probe_scope.c ****              p_ch = &ProbeScope_Ch8;
+ 702:../probe_scope.c ****              break;
+ 703:../probe_scope.c **** #endif
+ 704:../probe_scope.c ****              
+ 705:../probe_scope.c ****         default:
+ 706:../probe_scope.c ****              p_ch                 = &ProbeScope_Ch1;
+ 1259              	 .loc 1 706 0
+ 1260 0020 B44B     	 ldr r3,.L157+4
+ 1261 0022 FB60     	 str r3,[r7,#12]
+ 707:../probe_scope.c ****              ProbeScope_TrigChSel = PROBE_SCOPE_CH1;
+ 1262              	 .loc 1 707 0
+ 1263 0024 B24B     	 ldr r3,.L157
+ 1264 0026 0122     	 mov r2,#1
+ 1265 0028 1A70     	 strb r2,[r3]
+ 708:../probe_scope.c ****              break;
+ 1266              	 .loc 1 708 0
+ 1267 002a C046     	 mov r8,r8
+ 1268              	.L85:
+ 709:../probe_scope.c ****     }         
+ 710:../probe_scope.c ****     ProbeScope_TrigFlag = 0;
+ 1269              	 .loc 1 710 0
+ 1270 002c B34B     	 ldr r3,.L157+12
+ 1271 002e 0022     	 mov r2,#0
+ 1272 0030 1A60     	 str r2,[r3]
+ 711:../probe_scope.c ****     if (p_ch->En == 1) {
+ 1273              	 .loc 1 711 0
+ 1274 0032 FB68     	 ldr r3,[r7,#12]
+ 1275 0034 1B68     	 ldr r3,[r3]
+ 1276 0036 012B     	 cmp r3,#1
+ 1277 0038 00D0     	 beq .LCB1057
+ 1278 003a D8E2     	 b .L81
+ 1279              	.LCB1057:
+ 712:../probe_scope.c ****         p_sample_prev = &p_ch->Samples[ProbeScope_SampleIxPrev];          // Point to previous posi
+ 1280              	 .loc 1 712 0
+ 1281 003c B04B     	 ldr r3,.L157+16
+ 1282 003e 1B68     	 ldr r3,[r3]
+ 1283 0040 0633     	 add r3,r3,#6
+ 1284 0042 9B00     	 lsl r3,r3,#2
+ 1285 0044 FA68     	 ldr r2,[r7,#12]
+ 1286 0046 D318     	 add r3,r2,r3
+ 1287 0048 BB60     	 str r3,[r7,#8]
+ 713:../probe_scope.c ****         p_sample_cur  = &p_ch->Samples[ProbeScope_SampleIxCur];           // Point to current  posi
+ 1288              	 .loc 1 713 0
+ 1289 004a AE4B     	 ldr r3,.L157+20
+ 1290 004c 1B68     	 ldr r3,[r3]
+ 1291 004e 0633     	 add r3,r3,#6
+ 1292 0050 9B00     	 lsl r3,r3,#2
+ 1293 0052 FA68     	 ldr r2,[r7,#12]
+ 1294 0054 D318     	 add r3,r2,r3
+ 1295 0056 7B60     	 str r3,[r7,#4]
+ 714:../probe_scope.c ****         if (ProbeScope_TrigSlope == PROBE_SCOPE_TRIG_POS) {
+ 1296              	 .loc 1 714 0
+ 1297 0058 AB4B     	 ldr r3,.L157+24
+ 1298 005a 1B68     	 ldr r3,[r3]
+ 1299 005c 012B     	 cmp r3,#1
+ 1300 005e 00D0     	 beq .LCB1075
+ 1301 0060 6CE1     	 b .L87
+ 1302              	.LCB1075:
+ 715:../probe_scope.c ****             switch (p_ch->DataType) {
+ 1303              	 .loc 1 715 0
+ 1304 0062 FB68     	 ldr r3,[r7,#12]
+ 1305 0064 1B79     	 ldrb r3,[r3,#4]
+ 1306 0066 062B     	 cmp r3,#6
+ 1307 0068 00D9     	 bls .LCB1079
+ 1308 006a C0E2     	 b .L81
+ 1309              	.LCB1079:
+ 1310 006c 9A00     	 lsl r2,r3,#2
+ 1311 006e A74B     	 ldr r3,.L157+28
+ 1312 0070 D318     	 add r3,r2,r3
+ 1313 0072 1B68     	 ldr r3,[r3]
+ 1314 0074 9F46     	 mov pc,r3
+ 1315              	 .section .rodata.ProbeScope_IsTrig,"a",%progbits
+ 1316              	 .align 2
+ 1317              	.L90:
+ 1318 0000 76000000 	 .word .L89
+ 1319 0004 D4000000 	 .word .L91
+ 1320 0008 3E010000 	 .word .L92
+ 1321 000c 9C010000 	 .word .L93
+ 1322 0010 06020000 	 .word .L94
+ 1323 0014 64020000 	 .word .L95
+ 1324 0018 C2020000 	 .word .L96
+ 1325              	 .section .text.ProbeScope_IsTrig
+ 1326              	.L89:
+ 716:../probe_scope.c ****                 case PROBE_SCOPE_INT08U:
+ 717:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 1327              	 .loc 1 717 0
+ 1328 0076 FB68     	 ldr r3,[r7,#12]
+ 1329 0078 9B68     	 ldr r3,[r3,#8]
+ 1330 007a 002B     	 cmp r3,#0
+ 1331 007c 19D1     	 bne .L97
+ 718:../probe_scope.c ****                          if (p_sample_prev->Val08U < p_sample_cur->Val08U) {
+ 1332              	 .loc 1 718 0
+ 1333 007e BB68     	 ldr r3,[r7,#8]
+ 1334 0080 1A78     	 ldrb r2,[r3]
+ 1335 0082 7B68     	 ldr r3,[r7,#4]
+ 1336 0084 1B78     	 ldrb r3,[r3]
+ 1337 0086 9A42     	 cmp r2,r3
+ 1338 0088 23D2     	 bcs .L99
+ 719:../probe_scope.c ****                              if (p_sample_prev->Val08U <= p_ch->TrigLevel.Val08U) {
+ 1339              	 .loc 1 719 0
+ 1340 008a BB68     	 ldr r3,[r7,#8]
+ 1341 008c 1A78     	 ldrb r2,[r3]
+ 1342 008e FB68     	 ldr r3,[r7,#12]
+ 1343 0090 1B7D     	 ldrb r3,[r3,#20]
+ 1344 0092 9A42     	 cmp r2,r3
+ 1345 0094 1DD8     	 bhi .L99
+ 720:../probe_scope.c ****                                  if (p_sample_cur->Val08U >= p_ch->TrigLevel.Val08U) {
+ 1346              	 .loc 1 720 0
+ 1347 0096 7B68     	 ldr r3,[r7,#4]
+ 1348 0098 1A78     	 ldrb r2,[r3]
+ 1349 009a FB68     	 ldr r3,[r7,#12]
+ 1350 009c 1B7D     	 ldrb r3,[r3,#20]
+ 1351 009e 9A42     	 cmp r2,r3
+ 1352 00a0 17D3     	 bcc .L99
+ 721:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 1353              	 .loc 1 721 0
+ 1354 00a2 964B     	 ldr r3,.L157+12
+ 1355 00a4 0122     	 mov r2,#1
+ 1356 00a6 1A60     	 str r2,[r3]
+ 722:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1357              	 .loc 1 722 0
+ 1358 00a8 964B     	 ldr r3,.L157+20
+ 1359 00aa 1A68     	 ldr r2,[r3]
+ 1360 00ac 984B     	 ldr r3,.L157+32
+ 1361 00ae 1A60     	 str r2,[r3]
+ 723:../probe_scope.c ****                                  }
+ 724:../probe_scope.c ****                              }
+ 725:../probe_scope.c ****                          }
+ 726:../probe_scope.c ****                      } else {
+ 727:../probe_scope.c ****                          if (p_sample_prev->Val08U == 0) {
+ 728:../probe_scope.c ****                              if (p_sample_cur->Val08U != 0) { 
+ 729:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 730:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 731:../probe_scope.c ****                              }
+ 732:../probe_scope.c ****                          }
+ 733:../probe_scope.c ****                      }
+ 734:../probe_scope.c ****                      break;
+ 1362              	 .loc 1 734 0
+ 1363 00b0 43E1     	 b .L88
+ 1364              	.L97:
+ 727:../probe_scope.c ****                              if (p_sample_cur->Val08U != 0) { 
+ 1365              	 .loc 1 727 0
+ 1366 00b2 BB68     	 ldr r3,[r7,#8]
+ 1367 00b4 1B78     	 ldrb r3,[r3]
+ 1368 00b6 002B     	 cmp r3,#0
+ 1369 00b8 0BD1     	 bne .L99
+ 728:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 1370              	 .loc 1 728 0
+ 1371 00ba 7B68     	 ldr r3,[r7,#4]
+ 1372 00bc 1B78     	 ldrb r3,[r3]
+ 1373 00be 002B     	 cmp r3,#0
+ 1374 00c0 07D0     	 beq .L99
+ 729:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1375              	 .loc 1 729 0
+ 1376 00c2 8E4B     	 ldr r3,.L157+12
+ 1377 00c4 0122     	 mov r2,#1
+ 1378 00c6 1A60     	 str r2,[r3]
+ 730:../probe_scope.c ****                              }
+ 1379              	 .loc 1 730 0
+ 1380 00c8 8E4B     	 ldr r3,.L157+20
+ 1381 00ca 1A68     	 ldr r2,[r3]
+ 1382 00cc 904B     	 ldr r3,.L157+32
+ 1383 00ce 1A60     	 str r2,[r3]
+ 1384              	 .loc 1 734 0
+ 1385 00d0 33E1     	 b .L88
+ 1386              	.L99:
+ 1387              	 .loc 1 734 0 is_stmt 0 discriminator 1
+ 1388 00d2 32E1     	 b .L88
+ 1389              	.L91:
+ 735:../probe_scope.c ****                      
+ 736:../probe_scope.c ****                 case PROBE_SCOPE_INT08S:
+ 737:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 1390              	 .loc 1 737 0 is_stmt 1
+ 1391 00d4 FB68     	 ldr r3,[r7,#12]
+ 1392 00d6 9B68     	 ldr r3,[r3,#8]
+ 1393 00d8 002B     	 cmp r3,#0
+ 1394 00da 1FD1     	 bne .L100
+ 738:../probe_scope.c ****                          if (p_sample_prev->Val08S < p_sample_cur->Val08S) {
+ 1395              	 .loc 1 738 0
+ 1396 00dc BB68     	 ldr r3,[r7,#8]
+ 1397 00de 1A78     	 ldrb r2,[r3]
+ 1398 00e0 7B68     	 ldr r3,[r7,#4]
+ 1399 00e2 1B78     	 ldrb r3,[r3]
+ 1400 00e4 52B2     	 sxtb r2,r2
+ 1401 00e6 5BB2     	 sxtb r3,r3
+ 1402 00e8 9A42     	 cmp r2,r3
+ 1403 00ea 27DA     	 bge .L102
+ 739:../probe_scope.c ****                              if (p_sample_prev->Val08S <= p_ch->TrigLevel.Val08S) {
+ 1404              	 .loc 1 739 0
+ 1405 00ec BB68     	 ldr r3,[r7,#8]
+ 1406 00ee 1A78     	 ldrb r2,[r3]
+ 1407 00f0 FB68     	 ldr r3,[r7,#12]
+ 1408 00f2 1B7D     	 ldrb r3,[r3,#20]
+ 1409 00f4 52B2     	 sxtb r2,r2
+ 1410 00f6 5BB2     	 sxtb r3,r3
+ 1411 00f8 9A42     	 cmp r2,r3
+ 1412 00fa 1FDC     	 bgt .L102
+ 740:../probe_scope.c ****                                  if (p_sample_cur->Val08S >= p_ch->TrigLevel.Val08S) {
+ 1413              	 .loc 1 740 0
+ 1414 00fc 7B68     	 ldr r3,[r7,#4]
+ 1415 00fe 1A78     	 ldrb r2,[r3]
+ 1416 0100 FB68     	 ldr r3,[r7,#12]
+ 1417 0102 1B7D     	 ldrb r3,[r3,#20]
+ 1418 0104 52B2     	 sxtb r2,r2
+ 1419 0106 5BB2     	 sxtb r3,r3
+ 1420 0108 9A42     	 cmp r2,r3
+ 1421 010a 17DB     	 blt .L102
+ 741:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 1422              	 .loc 1 741 0
+ 1423 010c 7B4B     	 ldr r3,.L157+12
+ 1424 010e 0122     	 mov r2,#1
+ 1425 0110 1A60     	 str r2,[r3]
+ 742:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1426              	 .loc 1 742 0
+ 1427 0112 7C4B     	 ldr r3,.L157+20
+ 1428 0114 1A68     	 ldr r2,[r3]
+ 1429 0116 7E4B     	 ldr r3,.L157+32
+ 1430 0118 1A60     	 str r2,[r3]
+ 743:../probe_scope.c ****                                  }
+ 744:../probe_scope.c ****                              }
+ 745:../probe_scope.c ****                          }
+ 746:../probe_scope.c ****                      } else {
+ 747:../probe_scope.c ****                          if (p_sample_prev->Val08S == 0) {
+ 748:../probe_scope.c ****                              if (p_sample_cur->Val08S != 0) { 
+ 749:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 750:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 751:../probe_scope.c ****                              }
+ 752:../probe_scope.c ****                          }
+ 753:../probe_scope.c ****                      }
+ 754:../probe_scope.c ****                      break;
+ 1431              	 .loc 1 754 0
+ 1432 011a 0EE1     	 b .L88
+ 1433              	.L100:
+ 747:../probe_scope.c ****                              if (p_sample_cur->Val08S != 0) { 
+ 1434              	 .loc 1 747 0
+ 1435 011c BB68     	 ldr r3,[r7,#8]
+ 1436 011e 1B78     	 ldrb r3,[r3]
+ 1437 0120 002B     	 cmp r3,#0
+ 1438 0122 0BD1     	 bne .L102
+ 748:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 1439              	 .loc 1 748 0
+ 1440 0124 7B68     	 ldr r3,[r7,#4]
+ 1441 0126 1B78     	 ldrb r3,[r3]
+ 1442 0128 002B     	 cmp r3,#0
+ 1443 012a 07D0     	 beq .L102
+ 749:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1444              	 .loc 1 749 0
+ 1445 012c 734B     	 ldr r3,.L157+12
+ 1446 012e 0122     	 mov r2,#1
+ 1447 0130 1A60     	 str r2,[r3]
+ 750:../probe_scope.c ****                              }
+ 1448              	 .loc 1 750 0
+ 1449 0132 744B     	 ldr r3,.L157+20
+ 1450 0134 1A68     	 ldr r2,[r3]
+ 1451 0136 764B     	 ldr r3,.L157+32
+ 1452 0138 1A60     	 str r2,[r3]
+ 1453              	 .loc 1 754 0
+ 1454 013a FEE0     	 b .L88
+ 1455              	.L102:
+ 1456              	 .loc 1 754 0 is_stmt 0 discriminator 3
+ 1457 013c FDE0     	 b .L88
+ 1458              	.L92:
+ 755:../probe_scope.c **** 
+ 756:../probe_scope.c **** #if PROBE_SCOPE_16_BIT_EN > 0                                    
+ 757:../probe_scope.c ****                 case PROBE_SCOPE_INT16U:
+ 758:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 1459              	 .loc 1 758 0 is_stmt 1
+ 1460 013e FB68     	 ldr r3,[r7,#12]
+ 1461 0140 9B68     	 ldr r3,[r3,#8]
+ 1462 0142 002B     	 cmp r3,#0
+ 1463 0144 19D1     	 bne .L103
+ 759:../probe_scope.c ****                          if (p_sample_prev->Val16U < p_sample_cur->Val16U) {
+ 1464              	 .loc 1 759 0
+ 1465 0146 BB68     	 ldr r3,[r7,#8]
+ 1466 0148 1A88     	 ldrh r2,[r3]
+ 1467 014a 7B68     	 ldr r3,[r7,#4]
+ 1468 014c 1B88     	 ldrh r3,[r3]
+ 1469 014e 9A42     	 cmp r2,r3
+ 1470 0150 23D2     	 bcs .L105
+ 760:../probe_scope.c ****                              if (p_sample_prev->Val16U <= p_ch->TrigLevel.Val16U) {
+ 1471              	 .loc 1 760 0
+ 1472 0152 BB68     	 ldr r3,[r7,#8]
+ 1473 0154 1A88     	 ldrh r2,[r3]
+ 1474 0156 FB68     	 ldr r3,[r7,#12]
+ 1475 0158 9B8A     	 ldrh r3,[r3,#20]
+ 1476 015a 9A42     	 cmp r2,r3
+ 1477 015c 1DD8     	 bhi .L105
+ 761:../probe_scope.c ****                                  if (p_sample_cur->Val16U >= p_ch->TrigLevel.Val16U) {
+ 1478              	 .loc 1 761 0
+ 1479 015e 7B68     	 ldr r3,[r7,#4]
+ 1480 0160 1A88     	 ldrh r2,[r3]
+ 1481 0162 FB68     	 ldr r3,[r7,#12]
+ 1482 0164 9B8A     	 ldrh r3,[r3,#20]
+ 1483 0166 9A42     	 cmp r2,r3
+ 1484 0168 17D3     	 bcc .L105
+ 762:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 1485              	 .loc 1 762 0
+ 1486 016a 644B     	 ldr r3,.L157+12
+ 1487 016c 0122     	 mov r2,#1
+ 1488 016e 1A60     	 str r2,[r3]
+ 763:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1489              	 .loc 1 763 0
+ 1490 0170 644B     	 ldr r3,.L157+20
+ 1491 0172 1A68     	 ldr r2,[r3]
+ 1492 0174 664B     	 ldr r3,.L157+32
+ 1493 0176 1A60     	 str r2,[r3]
+ 764:../probe_scope.c ****                                  }
+ 765:../probe_scope.c ****                              }
+ 766:../probe_scope.c ****                          }
+ 767:../probe_scope.c ****                      } else {
+ 768:../probe_scope.c ****                          if (p_sample_prev->Val16U == 0) {
+ 769:../probe_scope.c ****                              if (p_sample_cur->Val16U != 0) { 
+ 770:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 771:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 772:../probe_scope.c ****                              }
+ 773:../probe_scope.c ****                          }
+ 774:../probe_scope.c ****                      }
+ 775:../probe_scope.c ****                      break;
+ 1494              	 .loc 1 775 0
+ 1495 0178 DFE0     	 b .L88
+ 1496              	.L103:
+ 768:../probe_scope.c ****                              if (p_sample_cur->Val16U != 0) { 
+ 1497              	 .loc 1 768 0
+ 1498 017a BB68     	 ldr r3,[r7,#8]
+ 1499 017c 1B88     	 ldrh r3,[r3]
+ 1500 017e 002B     	 cmp r3,#0
+ 1501 0180 0BD1     	 bne .L105
+ 769:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 1502              	 .loc 1 769 0
+ 1503 0182 7B68     	 ldr r3,[r7,#4]
+ 1504 0184 1B88     	 ldrh r3,[r3]
+ 1505 0186 002B     	 cmp r3,#0
+ 1506 0188 07D0     	 beq .L105
+ 770:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1507              	 .loc 1 770 0
+ 1508 018a 5C4B     	 ldr r3,.L157+12
+ 1509 018c 0122     	 mov r2,#1
+ 1510 018e 1A60     	 str r2,[r3]
+ 771:../probe_scope.c ****                              }
+ 1511              	 .loc 1 771 0
+ 1512 0190 5C4B     	 ldr r3,.L157+20
+ 1513 0192 1A68     	 ldr r2,[r3]
+ 1514 0194 5E4B     	 ldr r3,.L157+32
+ 1515 0196 1A60     	 str r2,[r3]
+ 1516              	 .loc 1 775 0
+ 1517 0198 CFE0     	 b .L88
+ 1518              	.L105:
+ 1519              	 .loc 1 775 0 is_stmt 0 discriminator 5
+ 1520 019a CEE0     	 b .L88
+ 1521              	.L93:
+ 776:../probe_scope.c ****                      
+ 777:../probe_scope.c ****                 case PROBE_SCOPE_INT16S:
+ 778:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 1522              	 .loc 1 778 0 is_stmt 1
+ 1523 019c FB68     	 ldr r3,[r7,#12]
+ 1524 019e 9B68     	 ldr r3,[r3,#8]
+ 1525 01a0 002B     	 cmp r3,#0
+ 1526 01a2 1FD1     	 bne .L106
+ 779:../probe_scope.c ****                          if (p_sample_prev->Val16S < p_sample_cur->Val16S) {
+ 1527              	 .loc 1 779 0
+ 1528 01a4 BB68     	 ldr r3,[r7,#8]
+ 1529 01a6 1A88     	 ldrh r2,[r3]
+ 1530 01a8 7B68     	 ldr r3,[r7,#4]
+ 1531 01aa 1B88     	 ldrh r3,[r3]
+ 1532 01ac 12B2     	 sxth r2,r2
+ 1533 01ae 1BB2     	 sxth r3,r3
+ 1534 01b0 9A42     	 cmp r2,r3
+ 1535 01b2 27DA     	 bge .L108
+ 780:../probe_scope.c ****                              if (p_sample_prev->Val16S <= p_ch->TrigLevel.Val16S) {
+ 1536              	 .loc 1 780 0
+ 1537 01b4 BB68     	 ldr r3,[r7,#8]
+ 1538 01b6 1A88     	 ldrh r2,[r3]
+ 1539 01b8 FB68     	 ldr r3,[r7,#12]
+ 1540 01ba 9B8A     	 ldrh r3,[r3,#20]
+ 1541 01bc 12B2     	 sxth r2,r2
+ 1542 01be 1BB2     	 sxth r3,r3
+ 1543 01c0 9A42     	 cmp r2,r3
+ 1544 01c2 1FDC     	 bgt .L108
+ 781:../probe_scope.c ****                                  if (p_sample_cur->Val16S >= p_ch->TrigLevel.Val16S) {
+ 1545              	 .loc 1 781 0
+ 1546 01c4 7B68     	 ldr r3,[r7,#4]
+ 1547 01c6 1A88     	 ldrh r2,[r3]
+ 1548 01c8 FB68     	 ldr r3,[r7,#12]
+ 1549 01ca 9B8A     	 ldrh r3,[r3,#20]
+ 1550 01cc 12B2     	 sxth r2,r2
+ 1551 01ce 1BB2     	 sxth r3,r3
+ 1552 01d0 9A42     	 cmp r2,r3
+ 1553 01d2 17DB     	 blt .L108
+ 782:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 1554              	 .loc 1 782 0
+ 1555 01d4 494B     	 ldr r3,.L157+12
+ 1556 01d6 0122     	 mov r2,#1
+ 1557 01d8 1A60     	 str r2,[r3]
+ 783:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1558              	 .loc 1 783 0
+ 1559 01da 4A4B     	 ldr r3,.L157+20
+ 1560 01dc 1A68     	 ldr r2,[r3]
+ 1561 01de 4C4B     	 ldr r3,.L157+32
+ 1562 01e0 1A60     	 str r2,[r3]
+ 784:../probe_scope.c ****                                  }
+ 785:../probe_scope.c ****                              }
+ 786:../probe_scope.c ****                          }
+ 787:../probe_scope.c ****                      } else {
+ 788:../probe_scope.c ****                          if (p_sample_prev->Val16S == 0) {
+ 789:../probe_scope.c ****                              if (p_sample_cur->Val16S != 0) { 
+ 790:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 791:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 792:../probe_scope.c ****                              }
+ 793:../probe_scope.c ****                          }
+ 794:../probe_scope.c ****                      }
+ 795:../probe_scope.c ****                      break;
+ 1563              	 .loc 1 795 0
+ 1564 01e2 AAE0     	 b .L88
+ 1565              	.L106:
+ 788:../probe_scope.c ****                              if (p_sample_cur->Val16S != 0) { 
+ 1566              	 .loc 1 788 0
+ 1567 01e4 BB68     	 ldr r3,[r7,#8]
+ 1568 01e6 1B88     	 ldrh r3,[r3]
+ 1569 01e8 002B     	 cmp r3,#0
+ 1570 01ea 0BD1     	 bne .L108
+ 789:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 1571              	 .loc 1 789 0
+ 1572 01ec 7B68     	 ldr r3,[r7,#4]
+ 1573 01ee 1B88     	 ldrh r3,[r3]
+ 1574 01f0 002B     	 cmp r3,#0
+ 1575 01f2 07D0     	 beq .L108
+ 790:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1576              	 .loc 1 790 0
+ 1577 01f4 414B     	 ldr r3,.L157+12
+ 1578 01f6 0122     	 mov r2,#1
+ 1579 01f8 1A60     	 str r2,[r3]
+ 791:../probe_scope.c ****                              }
+ 1580              	 .loc 1 791 0
+ 1581 01fa 424B     	 ldr r3,.L157+20
+ 1582 01fc 1A68     	 ldr r2,[r3]
+ 1583 01fe 444B     	 ldr r3,.L157+32
+ 1584 0200 1A60     	 str r2,[r3]
+ 1585              	 .loc 1 795 0
+ 1586 0202 9AE0     	 b .L88
+ 1587              	.L108:
+ 1588              	 .loc 1 795 0 is_stmt 0 discriminator 7
+ 1589 0204 99E0     	 b .L88
+ 1590              	.L94:
+ 796:../probe_scope.c **** #endif
+ 797:../probe_scope.c **** 
+ 798:../probe_scope.c **** #if PROBE_SCOPE_32_BIT_EN > 0                                   
+ 799:../probe_scope.c ****                 case PROBE_SCOPE_INT32U:
+ 800:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 1591              	 .loc 1 800 0 is_stmt 1
+ 1592 0206 FB68     	 ldr r3,[r7,#12]
+ 1593 0208 9B68     	 ldr r3,[r3,#8]
+ 1594 020a 002B     	 cmp r3,#0
+ 1595 020c 19D1     	 bne .L109
+ 801:../probe_scope.c ****                          if (p_sample_prev->Val32U < p_sample_cur->Val32U) {
+ 1596              	 .loc 1 801 0
+ 1597 020e BB68     	 ldr r3,[r7,#8]
+ 1598 0210 1A68     	 ldr r2,[r3]
+ 1599 0212 7B68     	 ldr r3,[r7,#4]
+ 1600 0214 1B68     	 ldr r3,[r3]
+ 1601 0216 9A42     	 cmp r2,r3
+ 1602 0218 23D2     	 bcs .L111
+ 802:../probe_scope.c ****                              if (p_sample_prev->Val32U <= p_ch->TrigLevel.Val32U) {
+ 1603              	 .loc 1 802 0
+ 1604 021a BB68     	 ldr r3,[r7,#8]
+ 1605 021c 1A68     	 ldr r2,[r3]
+ 1606 021e FB68     	 ldr r3,[r7,#12]
+ 1607 0220 5B69     	 ldr r3,[r3,#20]
+ 1608 0222 9A42     	 cmp r2,r3
+ 1609 0224 1DD8     	 bhi .L111
+ 803:../probe_scope.c ****                                  if (p_sample_cur->Val32U >= p_ch->TrigLevel.Val32U) {
+ 1610              	 .loc 1 803 0
+ 1611 0226 7B68     	 ldr r3,[r7,#4]
+ 1612 0228 1A68     	 ldr r2,[r3]
+ 1613 022a FB68     	 ldr r3,[r7,#12]
+ 1614 022c 5B69     	 ldr r3,[r3,#20]
+ 1615 022e 9A42     	 cmp r2,r3
+ 1616 0230 17D3     	 bcc .L111
+ 804:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 1617              	 .loc 1 804 0
+ 1618 0232 324B     	 ldr r3,.L157+12
+ 1619 0234 0122     	 mov r2,#1
+ 1620 0236 1A60     	 str r2,[r3]
+ 805:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1621              	 .loc 1 805 0
+ 1622 0238 324B     	 ldr r3,.L157+20
+ 1623 023a 1A68     	 ldr r2,[r3]
+ 1624 023c 344B     	 ldr r3,.L157+32
+ 1625 023e 1A60     	 str r2,[r3]
+ 806:../probe_scope.c ****                                  }
+ 807:../probe_scope.c ****                              }
+ 808:../probe_scope.c ****                          }
+ 809:../probe_scope.c ****                      } else {
+ 810:../probe_scope.c ****                          if (p_sample_prev->Val32U == 0) {
+ 811:../probe_scope.c ****                              if (p_sample_cur->Val32U != 0) {
+ 812:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 813:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 814:../probe_scope.c ****                              }
+ 815:../probe_scope.c ****                          }
+ 816:../probe_scope.c ****                      }
+ 817:../probe_scope.c ****                      break;
+ 1626              	 .loc 1 817 0
+ 1627 0240 7BE0     	 b .L88
+ 1628              	.L109:
+ 810:../probe_scope.c ****                              if (p_sample_cur->Val32U != 0) {
+ 1629              	 .loc 1 810 0
+ 1630 0242 BB68     	 ldr r3,[r7,#8]
+ 1631 0244 1B68     	 ldr r3,[r3]
+ 1632 0246 002B     	 cmp r3,#0
+ 1633 0248 0BD1     	 bne .L111
+ 811:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 1634              	 .loc 1 811 0
+ 1635 024a 7B68     	 ldr r3,[r7,#4]
+ 1636 024c 1B68     	 ldr r3,[r3]
+ 1637 024e 002B     	 cmp r3,#0
+ 1638 0250 07D0     	 beq .L111
+ 812:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1639              	 .loc 1 812 0
+ 1640 0252 2A4B     	 ldr r3,.L157+12
+ 1641 0254 0122     	 mov r2,#1
+ 1642 0256 1A60     	 str r2,[r3]
+ 813:../probe_scope.c ****                              }
+ 1643              	 .loc 1 813 0
+ 1644 0258 2A4B     	 ldr r3,.L157+20
+ 1645 025a 1A68     	 ldr r2,[r3]
+ 1646 025c 2C4B     	 ldr r3,.L157+32
+ 1647 025e 1A60     	 str r2,[r3]
+ 1648              	 .loc 1 817 0
+ 1649 0260 6BE0     	 b .L88
+ 1650              	.L111:
+ 1651              	 .loc 1 817 0 is_stmt 0 discriminator 9
+ 1652 0262 6AE0     	 b .L88
+ 1653              	.L95:
+ 818:../probe_scope.c ****                      
+ 819:../probe_scope.c ****                 case PROBE_SCOPE_INT32S:
+ 820:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 1654              	 .loc 1 820 0 is_stmt 1
+ 1655 0264 FB68     	 ldr r3,[r7,#12]
+ 1656 0266 9B68     	 ldr r3,[r3,#8]
+ 1657 0268 002B     	 cmp r3,#0
+ 1658 026a 19D1     	 bne .L112
+ 821:../probe_scope.c ****                          if (p_sample_prev->Val32S < p_sample_cur->Val32S) {
+ 1659              	 .loc 1 821 0
+ 1660 026c BB68     	 ldr r3,[r7,#8]
+ 1661 026e 1A68     	 ldr r2,[r3]
+ 1662 0270 7B68     	 ldr r3,[r7,#4]
+ 1663 0272 1B68     	 ldr r3,[r3]
+ 1664 0274 9A42     	 cmp r2,r3
+ 1665 0276 23DA     	 bge .L114
+ 822:../probe_scope.c ****                              if (p_sample_prev->Val32S <= p_ch->TrigLevel.Val32S) {
+ 1666              	 .loc 1 822 0
+ 1667 0278 BB68     	 ldr r3,[r7,#8]
+ 1668 027a 1A68     	 ldr r2,[r3]
+ 1669 027c FB68     	 ldr r3,[r7,#12]
+ 1670 027e 5B69     	 ldr r3,[r3,#20]
+ 1671 0280 9A42     	 cmp r2,r3
+ 1672 0282 1DDC     	 bgt .L114
+ 823:../probe_scope.c ****                                  if (p_sample_cur->Val32S >= p_ch->TrigLevel.Val32S) {
+ 1673              	 .loc 1 823 0
+ 1674 0284 7B68     	 ldr r3,[r7,#4]
+ 1675 0286 1A68     	 ldr r2,[r3]
+ 1676 0288 FB68     	 ldr r3,[r7,#12]
+ 1677 028a 5B69     	 ldr r3,[r3,#20]
+ 1678 028c 9A42     	 cmp r2,r3
+ 1679 028e 17DB     	 blt .L114
+ 824:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 1680              	 .loc 1 824 0
+ 1681 0290 1A4B     	 ldr r3,.L157+12
+ 1682 0292 0122     	 mov r2,#1
+ 1683 0294 1A60     	 str r2,[r3]
+ 825:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1684              	 .loc 1 825 0
+ 1685 0296 1B4B     	 ldr r3,.L157+20
+ 1686 0298 1A68     	 ldr r2,[r3]
+ 1687 029a 1D4B     	 ldr r3,.L157+32
+ 1688 029c 1A60     	 str r2,[r3]
+ 826:../probe_scope.c ****                                  }
+ 827:../probe_scope.c ****                              }
+ 828:../probe_scope.c ****                          }
+ 829:../probe_scope.c ****                      } else {
+ 830:../probe_scope.c ****                          if (p_sample_prev->Val32S == 0) {
+ 831:../probe_scope.c ****                              if (p_sample_cur->Val32S != 0) {
+ 832:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 833:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 834:../probe_scope.c ****                              }
+ 835:../probe_scope.c ****                          }
+ 836:../probe_scope.c ****                      }
+ 837:../probe_scope.c ****                      break;
+ 1689              	 .loc 1 837 0
+ 1690 029e 4CE0     	 b .L88
+ 1691              	.L112:
+ 830:../probe_scope.c ****                              if (p_sample_cur->Val32S != 0) {
+ 1692              	 .loc 1 830 0
+ 1693 02a0 BB68     	 ldr r3,[r7,#8]
+ 1694 02a2 1B68     	 ldr r3,[r3]
+ 1695 02a4 002B     	 cmp r3,#0
+ 1696 02a6 0BD1     	 bne .L114
+ 831:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 1697              	 .loc 1 831 0
+ 1698 02a8 7B68     	 ldr r3,[r7,#4]
+ 1699 02aa 1B68     	 ldr r3,[r3]
+ 1700 02ac 002B     	 cmp r3,#0
+ 1701 02ae 07D0     	 beq .L114
+ 832:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1702              	 .loc 1 832 0
+ 1703 02b0 124B     	 ldr r3,.L157+12
+ 1704 02b2 0122     	 mov r2,#1
+ 1705 02b4 1A60     	 str r2,[r3]
+ 833:../probe_scope.c ****                              }
+ 1706              	 .loc 1 833 0
+ 1707 02b6 134B     	 ldr r3,.L157+20
+ 1708 02b8 1A68     	 ldr r2,[r3]
+ 1709 02ba 154B     	 ldr r3,.L157+32
+ 1710 02bc 1A60     	 str r2,[r3]
+ 1711              	 .loc 1 837 0
+ 1712 02be 3CE0     	 b .L88
+ 1713              	.L114:
+ 1714              	 .loc 1 837 0 is_stmt 0 discriminator 11
+ 1715 02c0 3BE0     	 b .L88
+ 1716              	.L96:
+ 838:../probe_scope.c ****                                     
+ 839:../probe_scope.c ****                 case PROBE_SCOPE_FP32:
+ 840:../probe_scope.c ****                      if (p_sample_prev->ValFP32 < p_sample_cur->ValFP32) {
+ 1717              	 .loc 1 840 0 is_stmt 1
+ 1718 02c2 BB68     	 ldr r3,[r7,#8]
+ 1719 02c4 1A68     	 ldr r2,[r3]
+ 1720 02c6 7B68     	 ldr r3,[r7,#4]
+ 1721 02c8 1B68     	 ldr r3,[r3]
+ 1722 02ca 101C     	 add r0,r2,#0
+ 1723 02cc 191C     	 add r1,r3,#0
+ 1724 02ce FFF7FEFF 	 bl __aeabi_fcmplt
+ 1725 02d2 031E     	 sub r3,r0,#0
+ 1726 02d4 00D1     	 bne .L149
+ 841:../probe_scope.c ****                          if (p_sample_prev->ValFP32 <= p_ch->TrigLevel.ValFP32) {
+ 842:../probe_scope.c ****                              if (p_sample_cur->ValFP32 >= p_ch->TrigLevel.ValFP32) {
+ 843:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 844:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 845:../probe_scope.c ****                              }
+ 846:../probe_scope.c ****                          }
+ 847:../probe_scope.c ****                      }
+ 848:../probe_scope.c ****                      break;
+ 1727              	 .loc 1 848 0
+ 1728 02d6 2FE0     	 b .L156
+ 1729              	.L149:
+ 841:../probe_scope.c ****                          if (p_sample_prev->ValFP32 <= p_ch->TrigLevel.ValFP32) {
+ 1730              	 .loc 1 841 0
+ 1731 02d8 BB68     	 ldr r3,[r7,#8]
+ 1732 02da 1A68     	 ldr r2,[r3]
+ 1733 02dc FB68     	 ldr r3,[r7,#12]
+ 1734 02de 5B69     	 ldr r3,[r3,#20]
+ 1735 02e0 101C     	 add r0,r2,#0
+ 1736 02e2 191C     	 add r1,r3,#0
+ 1737 02e4 FFF7FEFF 	 bl __aeabi_fcmple
+ 1738 02e8 031E     	 sub r3,r0,#0
+ 1739 02ea 13D1     	 bne .L150
+ 1740              	 .loc 1 848 0
+ 1741 02ec 24E0     	 b .L156
+ 1742              	.L158:
+ 1743 02ee C046     	 .align 2
+ 1744              	.L157:
+ 1745 02f0 00000000 	 .word ProbeScope_TrigChSel
+ 1746 02f4 00000000 	 .word ProbeScope_Ch1
+ 1747 02f8 00000000 	 .word ProbeScope_Ch2
+ 1748 02fc 00000000 	 .word ProbeScope_TrigFlag
+ 1749 0300 00000000 	 .word ProbeScope_SampleIxPrev
+ 1750 0304 00000000 	 .word ProbeScope_SampleIxCur
+ 1751 0308 00000000 	 .word ProbeScope_TrigSlope
+ 1752 030c 00000000 	 .word .L90
+ 1753 0310 00000000 	 .word ProbeScope_TrigIx
+ 1754              	.L150:
+ 842:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 1755              	 .loc 1 842 0
+ 1756 0314 7B68     	 ldr r3,[r7,#4]
+ 1757 0316 1A68     	 ldr r2,[r3]
+ 1758 0318 FB68     	 ldr r3,[r7,#12]
+ 1759 031a 5B69     	 ldr r3,[r3,#20]
+ 1760 031c 101C     	 add r0,r2,#0
+ 1761 031e 191C     	 add r1,r3,#0
+ 1762 0320 FFF7FEFF 	 bl __aeabi_fcmpge
+ 1763 0324 031E     	 sub r3,r0,#0
+ 1764 0326 00D1     	 bne .L151
+ 1765              	 .loc 1 848 0
+ 1766 0328 06E0     	 b .L156
+ 1767              	.L151:
+ 843:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1768              	 .loc 1 843 0
+ 1769 032a B24B     	 ldr r3,.L159
+ 1770 032c 0122     	 mov r2,#1
+ 1771 032e 1A60     	 str r2,[r3]
+ 844:../probe_scope.c ****                              }
+ 1772              	 .loc 1 844 0
+ 1773 0330 B14B     	 ldr r3,.L159+4
+ 1774 0332 1A68     	 ldr r2,[r3]
+ 1775 0334 B14B     	 ldr r3,.L159+8
+ 1776 0336 1A60     	 str r2,[r3]
+ 1777              	.L156:
+ 1778              	 .loc 1 848 0
+ 1779 0338 C046     	 mov r8,r8
+ 1780              	.L88:
+ 1781 033a 58E1     	 b .L81
+ 1782              	.L87:
+ 849:../probe_scope.c **** #endif
+ 850:../probe_scope.c ****             }
+ 851:../probe_scope.c ****         } else {
+ 852:../probe_scope.c ****             switch (p_ch->DataType) {
+ 1783              	 .loc 1 852 0
+ 1784 033c FB68     	 ldr r3,[r7,#12]
+ 1785 033e 1B79     	 ldrb r3,[r3,#4]
+ 1786 0340 062B     	 cmp r3,#6
+ 1787 0342 00D9     	 bls .LCB1514
+ 1788 0344 53E1     	 b .L81
+ 1789              	.LCB1514:
+ 1790 0346 9A00     	 lsl r2,r3,#2
+ 1791 0348 AD4B     	 ldr r3,.L159+12
+ 1792 034a D318     	 add r3,r2,r3
+ 1793 034c 1B68     	 ldr r3,[r3]
+ 1794 034e 9F46     	 mov pc,r3
+ 1795              	 .section .rodata.ProbeScope_IsTrig
+ 1796              	 .align 2
+ 1797              	.L120:
+ 1798 001c 50030000 	 .word .L119
+ 1799 0020 AE030000 	 .word .L121
+ 1800 0024 18040000 	 .word .L122
+ 1801 0028 76040000 	 .word .L123
+ 1802 002c E0040000 	 .word .L124
+ 1803 0030 3E050000 	 .word .L125
+ 1804 0034 9C050000 	 .word .L126
+ 1805              	 .section .text.ProbeScope_IsTrig
+ 1806              	.L119:
+ 853:../probe_scope.c ****                 case PROBE_SCOPE_INT08U:
+ 854:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 1807              	 .loc 1 854 0
+ 1808 0350 FB68     	 ldr r3,[r7,#12]
+ 1809 0352 9B68     	 ldr r3,[r3,#8]
+ 1810 0354 002B     	 cmp r3,#0
+ 1811 0356 19D1     	 bne .L127
+ 855:../probe_scope.c ****                          if (p_sample_prev->Val08U > p_sample_cur->Val08U) {
+ 1812              	 .loc 1 855 0
+ 1813 0358 BB68     	 ldr r3,[r7,#8]
+ 1814 035a 1A78     	 ldrb r2,[r3]
+ 1815 035c 7B68     	 ldr r3,[r7,#4]
+ 1816 035e 1B78     	 ldrb r3,[r3]
+ 1817 0360 9A42     	 cmp r2,r3
+ 1818 0362 23D9     	 bls .L129
+ 856:../probe_scope.c ****                              if (p_sample_prev->Val08U >= p_ch->TrigLevel.Val08U) {
+ 1819              	 .loc 1 856 0
+ 1820 0364 BB68     	 ldr r3,[r7,#8]
+ 1821 0366 1A78     	 ldrb r2,[r3]
+ 1822 0368 FB68     	 ldr r3,[r7,#12]
+ 1823 036a 1B7D     	 ldrb r3,[r3,#20]
+ 1824 036c 9A42     	 cmp r2,r3
+ 1825 036e 1DD3     	 bcc .L129
+ 857:../probe_scope.c ****                                  if (p_sample_cur->Val08U <= p_ch->TrigLevel.Val08U) {
+ 1826              	 .loc 1 857 0
+ 1827 0370 7B68     	 ldr r3,[r7,#4]
+ 1828 0372 1A78     	 ldrb r2,[r3]
+ 1829 0374 FB68     	 ldr r3,[r7,#12]
+ 1830 0376 1B7D     	 ldrb r3,[r3,#20]
+ 1831 0378 9A42     	 cmp r2,r3
+ 1832 037a 17D8     	 bhi .L129
+ 858:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 1833              	 .loc 1 858 0
+ 1834 037c 9D4B     	 ldr r3,.L159
+ 1835 037e 0122     	 mov r2,#1
+ 1836 0380 1A60     	 str r2,[r3]
+ 859:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1837              	 .loc 1 859 0
+ 1838 0382 9D4B     	 ldr r3,.L159+4
+ 1839 0384 1A68     	 ldr r2,[r3]
+ 1840 0386 9D4B     	 ldr r3,.L159+8
+ 1841 0388 1A60     	 str r2,[r3]
+ 860:../probe_scope.c ****                                  }
+ 861:../probe_scope.c ****                              }
+ 862:../probe_scope.c ****                          }
+ 863:../probe_scope.c ****                      } else {
+ 864:../probe_scope.c ****                          if (p_sample_prev->Val08U != 0) {
+ 865:../probe_scope.c ****                              if (p_sample_cur->Val08U == 0) {
+ 866:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 867:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 868:../probe_scope.c ****                              }
+ 869:../probe_scope.c ****                          }
+ 870:../probe_scope.c ****                      }
+ 871:../probe_scope.c ****                      break;
+ 1842              	 .loc 1 871 0
+ 1843 038a 30E1     	 b .L81
+ 1844              	.L127:
+ 864:../probe_scope.c ****                              if (p_sample_cur->Val08U == 0) {
+ 1845              	 .loc 1 864 0
+ 1846 038c BB68     	 ldr r3,[r7,#8]
+ 1847 038e 1B78     	 ldrb r3,[r3]
+ 1848 0390 002B     	 cmp r3,#0
+ 1849 0392 0BD0     	 beq .L129
+ 865:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 1850              	 .loc 1 865 0
+ 1851 0394 7B68     	 ldr r3,[r7,#4]
+ 1852 0396 1B78     	 ldrb r3,[r3]
+ 1853 0398 002B     	 cmp r3,#0
+ 1854 039a 07D1     	 bne .L129
+ 866:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1855              	 .loc 1 866 0
+ 1856 039c 954B     	 ldr r3,.L159
+ 1857 039e 0122     	 mov r2,#1
+ 1858 03a0 1A60     	 str r2,[r3]
+ 867:../probe_scope.c ****                              }
+ 1859              	 .loc 1 867 0
+ 1860 03a2 954B     	 ldr r3,.L159+4
+ 1861 03a4 1A68     	 ldr r2,[r3]
+ 1862 03a6 954B     	 ldr r3,.L159+8
+ 1863 03a8 1A60     	 str r2,[r3]
+ 1864              	 .loc 1 871 0
+ 1865 03aa 20E1     	 b .L81
+ 1866              	.L129:
+ 1867              	 .loc 1 871 0 is_stmt 0 discriminator 14
+ 1868 03ac 1FE1     	 b .L81
+ 1869              	.L121:
+ 872:../probe_scope.c ****                      
+ 873:../probe_scope.c ****                 case PROBE_SCOPE_INT08S:
+ 874:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 1870              	 .loc 1 874 0 is_stmt 1
+ 1871 03ae FB68     	 ldr r3,[r7,#12]
+ 1872 03b0 9B68     	 ldr r3,[r3,#8]
+ 1873 03b2 002B     	 cmp r3,#0
+ 1874 03b4 1FD1     	 bne .L130
+ 875:../probe_scope.c ****                          if (p_sample_prev->Val08S > p_sample_cur->Val08S) {
+ 1875              	 .loc 1 875 0
+ 1876 03b6 BB68     	 ldr r3,[r7,#8]
+ 1877 03b8 1A78     	 ldrb r2,[r3]
+ 1878 03ba 7B68     	 ldr r3,[r7,#4]
+ 1879 03bc 1B78     	 ldrb r3,[r3]
+ 1880 03be 52B2     	 sxtb r2,r2
+ 1881 03c0 5BB2     	 sxtb r3,r3
+ 1882 03c2 9A42     	 cmp r2,r3
+ 1883 03c4 27DD     	 ble .L132
+ 876:../probe_scope.c ****                              if (p_sample_prev->Val08S >= p_ch->TrigLevel.Val08S) {
+ 1884              	 .loc 1 876 0
+ 1885 03c6 BB68     	 ldr r3,[r7,#8]
+ 1886 03c8 1A78     	 ldrb r2,[r3]
+ 1887 03ca FB68     	 ldr r3,[r7,#12]
+ 1888 03cc 1B7D     	 ldrb r3,[r3,#20]
+ 1889 03ce 52B2     	 sxtb r2,r2
+ 1890 03d0 5BB2     	 sxtb r3,r3
+ 1891 03d2 9A42     	 cmp r2,r3
+ 1892 03d4 1FDB     	 blt .L132
+ 877:../probe_scope.c ****                                  if (p_sample_cur->Val08S <= p_ch->TrigLevel.Val08S) {
+ 1893              	 .loc 1 877 0
+ 1894 03d6 7B68     	 ldr r3,[r7,#4]
+ 1895 03d8 1A78     	 ldrb r2,[r3]
+ 1896 03da FB68     	 ldr r3,[r7,#12]
+ 1897 03dc 1B7D     	 ldrb r3,[r3,#20]
+ 1898 03de 52B2     	 sxtb r2,r2
+ 1899 03e0 5BB2     	 sxtb r3,r3
+ 1900 03e2 9A42     	 cmp r2,r3
+ 1901 03e4 17DC     	 bgt .L132
+ 878:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 1902              	 .loc 1 878 0
+ 1903 03e6 834B     	 ldr r3,.L159
+ 1904 03e8 0122     	 mov r2,#1
+ 1905 03ea 1A60     	 str r2,[r3]
+ 879:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1906              	 .loc 1 879 0
+ 1907 03ec 824B     	 ldr r3,.L159+4
+ 1908 03ee 1A68     	 ldr r2,[r3]
+ 1909 03f0 824B     	 ldr r3,.L159+8
+ 1910 03f2 1A60     	 str r2,[r3]
+ 880:../probe_scope.c ****                                  }
+ 881:../probe_scope.c ****                              }
+ 882:../probe_scope.c ****                          }
+ 883:../probe_scope.c ****                      } else {
+ 884:../probe_scope.c ****                          if (p_sample_prev->Val08S != 0) {
+ 885:../probe_scope.c ****                              if (p_sample_cur->Val08S == 0) {
+ 886:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 887:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 888:../probe_scope.c ****                              }
+ 889:../probe_scope.c ****                          }
+ 890:../probe_scope.c ****                      }
+ 891:../probe_scope.c ****                      break;
+ 1911              	 .loc 1 891 0
+ 1912 03f4 FBE0     	 b .L81
+ 1913              	.L130:
+ 884:../probe_scope.c ****                              if (p_sample_cur->Val08S == 0) {
+ 1914              	 .loc 1 884 0
+ 1915 03f6 BB68     	 ldr r3,[r7,#8]
+ 1916 03f8 1B78     	 ldrb r3,[r3]
+ 1917 03fa 002B     	 cmp r3,#0
+ 1918 03fc 0BD0     	 beq .L132
+ 885:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 1919              	 .loc 1 885 0
+ 1920 03fe 7B68     	 ldr r3,[r7,#4]
+ 1921 0400 1B78     	 ldrb r3,[r3]
+ 1922 0402 002B     	 cmp r3,#0
+ 1923 0404 07D1     	 bne .L132
+ 886:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1924              	 .loc 1 886 0
+ 1925 0406 7B4B     	 ldr r3,.L159
+ 1926 0408 0122     	 mov r2,#1
+ 1927 040a 1A60     	 str r2,[r3]
+ 887:../probe_scope.c ****                              }
+ 1928              	 .loc 1 887 0
+ 1929 040c 7A4B     	 ldr r3,.L159+4
+ 1930 040e 1A68     	 ldr r2,[r3]
+ 1931 0410 7A4B     	 ldr r3,.L159+8
+ 1932 0412 1A60     	 str r2,[r3]
+ 1933              	 .loc 1 891 0
+ 1934 0414 EBE0     	 b .L81
+ 1935              	.L132:
+ 1936              	 .loc 1 891 0 is_stmt 0 discriminator 15
+ 1937 0416 EAE0     	 b .L81
+ 1938              	.L122:
+ 892:../probe_scope.c ****                                     
+ 893:../probe_scope.c **** #if PROBE_SCOPE_16_BIT_EN > 0                                   
+ 894:../probe_scope.c ****                 case PROBE_SCOPE_INT16U:
+ 895:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 1939              	 .loc 1 895 0 is_stmt 1
+ 1940 0418 FB68     	 ldr r3,[r7,#12]
+ 1941 041a 9B68     	 ldr r3,[r3,#8]
+ 1942 041c 002B     	 cmp r3,#0
+ 1943 041e 19D1     	 bne .L133
+ 896:../probe_scope.c ****                          if (p_sample_prev->Val16U > p_sample_cur->Val16U) {
+ 1944              	 .loc 1 896 0
+ 1945 0420 BB68     	 ldr r3,[r7,#8]
+ 1946 0422 1A88     	 ldrh r2,[r3]
+ 1947 0424 7B68     	 ldr r3,[r7,#4]
+ 1948 0426 1B88     	 ldrh r3,[r3]
+ 1949 0428 9A42     	 cmp r2,r3
+ 1950 042a 23D9     	 bls .L135
+ 897:../probe_scope.c ****                              if (p_sample_prev->Val16U >= p_ch->TrigLevel.Val16U) {
+ 1951              	 .loc 1 897 0
+ 1952 042c BB68     	 ldr r3,[r7,#8]
+ 1953 042e 1A88     	 ldrh r2,[r3]
+ 1954 0430 FB68     	 ldr r3,[r7,#12]
+ 1955 0432 9B8A     	 ldrh r3,[r3,#20]
+ 1956 0434 9A42     	 cmp r2,r3
+ 1957 0436 1DD3     	 bcc .L135
+ 898:../probe_scope.c ****                                  if (p_sample_cur->Val16U <= p_ch->TrigLevel.Val16U) {
+ 1958              	 .loc 1 898 0
+ 1959 0438 7B68     	 ldr r3,[r7,#4]
+ 1960 043a 1A88     	 ldrh r2,[r3]
+ 1961 043c FB68     	 ldr r3,[r7,#12]
+ 1962 043e 9B8A     	 ldrh r3,[r3,#20]
+ 1963 0440 9A42     	 cmp r2,r3
+ 1964 0442 17D8     	 bhi .L135
+ 899:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 1965              	 .loc 1 899 0
+ 1966 0444 6B4B     	 ldr r3,.L159
+ 1967 0446 0122     	 mov r2,#1
+ 1968 0448 1A60     	 str r2,[r3]
+ 900:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1969              	 .loc 1 900 0
+ 1970 044a 6B4B     	 ldr r3,.L159+4
+ 1971 044c 1A68     	 ldr r2,[r3]
+ 1972 044e 6B4B     	 ldr r3,.L159+8
+ 1973 0450 1A60     	 str r2,[r3]
+ 901:../probe_scope.c ****                                  }
+ 902:../probe_scope.c ****                              }
+ 903:../probe_scope.c ****                          }
+ 904:../probe_scope.c ****                      } else {
+ 905:../probe_scope.c ****                          if (p_sample_prev->Val16U != 0) {
+ 906:../probe_scope.c ****                              if (p_sample_cur->Val16U == 0) {
+ 907:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 908:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 909:../probe_scope.c ****                              }
+ 910:../probe_scope.c ****                          }
+ 911:../probe_scope.c ****                      }
+ 912:../probe_scope.c ****                      break;
+ 1974              	 .loc 1 912 0
+ 1975 0452 CCE0     	 b .L81
+ 1976              	.L133:
+ 905:../probe_scope.c ****                              if (p_sample_cur->Val16U == 0) {
+ 1977              	 .loc 1 905 0
+ 1978 0454 BB68     	 ldr r3,[r7,#8]
+ 1979 0456 1B88     	 ldrh r3,[r3]
+ 1980 0458 002B     	 cmp r3,#0
+ 1981 045a 0BD0     	 beq .L135
+ 906:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 1982              	 .loc 1 906 0
+ 1983 045c 7B68     	 ldr r3,[r7,#4]
+ 1984 045e 1B88     	 ldrh r3,[r3]
+ 1985 0460 002B     	 cmp r3,#0
+ 1986 0462 07D1     	 bne .L135
+ 907:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 1987              	 .loc 1 907 0
+ 1988 0464 634B     	 ldr r3,.L159
+ 1989 0466 0122     	 mov r2,#1
+ 1990 0468 1A60     	 str r2,[r3]
+ 908:../probe_scope.c ****                              }
+ 1991              	 .loc 1 908 0
+ 1992 046a 634B     	 ldr r3,.L159+4
+ 1993 046c 1A68     	 ldr r2,[r3]
+ 1994 046e 634B     	 ldr r3,.L159+8
+ 1995 0470 1A60     	 str r2,[r3]
+ 1996              	 .loc 1 912 0
+ 1997 0472 BCE0     	 b .L81
+ 1998              	.L135:
+ 1999              	 .loc 1 912 0 is_stmt 0 discriminator 16
+ 2000 0474 BBE0     	 b .L81
+ 2001              	.L123:
+ 913:../probe_scope.c ****                      
+ 914:../probe_scope.c ****                 case PROBE_SCOPE_INT16S:
+ 915:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 2002              	 .loc 1 915 0 is_stmt 1
+ 2003 0476 FB68     	 ldr r3,[r7,#12]
+ 2004 0478 9B68     	 ldr r3,[r3,#8]
+ 2005 047a 002B     	 cmp r3,#0
+ 2006 047c 1FD1     	 bne .L136
+ 916:../probe_scope.c ****                          if (p_sample_prev->Val16S > p_sample_cur->Val16S) {
+ 2007              	 .loc 1 916 0
+ 2008 047e BB68     	 ldr r3,[r7,#8]
+ 2009 0480 1A88     	 ldrh r2,[r3]
+ 2010 0482 7B68     	 ldr r3,[r7,#4]
+ 2011 0484 1B88     	 ldrh r3,[r3]
+ 2012 0486 12B2     	 sxth r2,r2
+ 2013 0488 1BB2     	 sxth r3,r3
+ 2014 048a 9A42     	 cmp r2,r3
+ 2015 048c 27DD     	 ble .L138
+ 917:../probe_scope.c ****                              if (p_sample_prev->Val16S >= p_ch->TrigLevel.Val16S) {
+ 2016              	 .loc 1 917 0
+ 2017 048e BB68     	 ldr r3,[r7,#8]
+ 2018 0490 1A88     	 ldrh r2,[r3]
+ 2019 0492 FB68     	 ldr r3,[r7,#12]
+ 2020 0494 9B8A     	 ldrh r3,[r3,#20]
+ 2021 0496 12B2     	 sxth r2,r2
+ 2022 0498 1BB2     	 sxth r3,r3
+ 2023 049a 9A42     	 cmp r2,r3
+ 2024 049c 1FDB     	 blt .L138
+ 918:../probe_scope.c ****                                  if (p_sample_cur->Val16S <= p_ch->TrigLevel.Val16S) {
+ 2025              	 .loc 1 918 0
+ 2026 049e 7B68     	 ldr r3,[r7,#4]
+ 2027 04a0 1A88     	 ldrh r2,[r3]
+ 2028 04a2 FB68     	 ldr r3,[r7,#12]
+ 2029 04a4 9B8A     	 ldrh r3,[r3,#20]
+ 2030 04a6 12B2     	 sxth r2,r2
+ 2031 04a8 1BB2     	 sxth r3,r3
+ 2032 04aa 9A42     	 cmp r2,r3
+ 2033 04ac 17DC     	 bgt .L138
+ 919:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 2034              	 .loc 1 919 0
+ 2035 04ae 514B     	 ldr r3,.L159
+ 2036 04b0 0122     	 mov r2,#1
+ 2037 04b2 1A60     	 str r2,[r3]
+ 920:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 2038              	 .loc 1 920 0
+ 2039 04b4 504B     	 ldr r3,.L159+4
+ 2040 04b6 1A68     	 ldr r2,[r3]
+ 2041 04b8 504B     	 ldr r3,.L159+8
+ 2042 04ba 1A60     	 str r2,[r3]
+ 921:../probe_scope.c ****                                  }
+ 922:../probe_scope.c ****                              }
+ 923:../probe_scope.c ****                          }
+ 924:../probe_scope.c ****                      } else {
+ 925:../probe_scope.c ****                          if (p_sample_prev->Val16S != 0) {
+ 926:../probe_scope.c ****                              if (p_sample_cur->Val16S == 0) {
+ 927:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 928:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 929:../probe_scope.c ****                              }
+ 930:../probe_scope.c ****                          }
+ 931:../probe_scope.c ****                      }
+ 932:../probe_scope.c ****                      break;
+ 2043              	 .loc 1 932 0
+ 2044 04bc 97E0     	 b .L81
+ 2045              	.L136:
+ 925:../probe_scope.c ****                              if (p_sample_cur->Val16S == 0) {
+ 2046              	 .loc 1 925 0
+ 2047 04be BB68     	 ldr r3,[r7,#8]
+ 2048 04c0 1B88     	 ldrh r3,[r3]
+ 2049 04c2 002B     	 cmp r3,#0
+ 2050 04c4 0BD0     	 beq .L138
+ 926:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 2051              	 .loc 1 926 0
+ 2052 04c6 7B68     	 ldr r3,[r7,#4]
+ 2053 04c8 1B88     	 ldrh r3,[r3]
+ 2054 04ca 002B     	 cmp r3,#0
+ 2055 04cc 07D1     	 bne .L138
+ 927:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 2056              	 .loc 1 927 0
+ 2057 04ce 494B     	 ldr r3,.L159
+ 2058 04d0 0122     	 mov r2,#1
+ 2059 04d2 1A60     	 str r2,[r3]
+ 928:../probe_scope.c ****                              }
+ 2060              	 .loc 1 928 0
+ 2061 04d4 484B     	 ldr r3,.L159+4
+ 2062 04d6 1A68     	 ldr r2,[r3]
+ 2063 04d8 484B     	 ldr r3,.L159+8
+ 2064 04da 1A60     	 str r2,[r3]
+ 2065              	 .loc 1 932 0
+ 2066 04dc 87E0     	 b .L81
+ 2067              	.L138:
+ 2068              	 .loc 1 932 0 is_stmt 0 discriminator 17
+ 2069 04de 86E0     	 b .L81
+ 2070              	.L124:
+ 933:../probe_scope.c **** #endif
+ 934:../probe_scope.c **** 
+ 935:../probe_scope.c **** #if PROBE_SCOPE_32_BIT_EN > 0                                                                     
+ 936:../probe_scope.c ****                 case PROBE_SCOPE_INT32U:
+ 937:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 2071              	 .loc 1 937 0 is_stmt 1
+ 2072 04e0 FB68     	 ldr r3,[r7,#12]
+ 2073 04e2 9B68     	 ldr r3,[r3,#8]
+ 2074 04e4 002B     	 cmp r3,#0
+ 2075 04e6 19D1     	 bne .L139
+ 938:../probe_scope.c ****                          if (p_sample_prev->Val32U > p_sample_cur->Val32U) {                  
+ 2076              	 .loc 1 938 0
+ 2077 04e8 BB68     	 ldr r3,[r7,#8]
+ 2078 04ea 1A68     	 ldr r2,[r3]
+ 2079 04ec 7B68     	 ldr r3,[r7,#4]
+ 2080 04ee 1B68     	 ldr r3,[r3]
+ 2081 04f0 9A42     	 cmp r2,r3
+ 2082 04f2 23D9     	 bls .L141
+ 939:../probe_scope.c ****                              if (p_sample_prev->Val32U >= p_ch->TrigLevel.Val32U) {
+ 2083              	 .loc 1 939 0
+ 2084 04f4 BB68     	 ldr r3,[r7,#8]
+ 2085 04f6 1A68     	 ldr r2,[r3]
+ 2086 04f8 FB68     	 ldr r3,[r7,#12]
+ 2087 04fa 5B69     	 ldr r3,[r3,#20]
+ 2088 04fc 9A42     	 cmp r2,r3
+ 2089 04fe 1DD3     	 bcc .L141
+ 940:../probe_scope.c ****                                  if (p_sample_cur->Val32U <= p_ch->TrigLevel.Val32U) {
+ 2090              	 .loc 1 940 0
+ 2091 0500 7B68     	 ldr r3,[r7,#4]
+ 2092 0502 1A68     	 ldr r2,[r3]
+ 2093 0504 FB68     	 ldr r3,[r7,#12]
+ 2094 0506 5B69     	 ldr r3,[r3,#20]
+ 2095 0508 9A42     	 cmp r2,r3
+ 2096 050a 17D8     	 bhi .L141
+ 941:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 2097              	 .loc 1 941 0
+ 2098 050c 394B     	 ldr r3,.L159
+ 2099 050e 0122     	 mov r2,#1
+ 2100 0510 1A60     	 str r2,[r3]
+ 942:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 2101              	 .loc 1 942 0
+ 2102 0512 394B     	 ldr r3,.L159+4
+ 2103 0514 1A68     	 ldr r2,[r3]
+ 2104 0516 394B     	 ldr r3,.L159+8
+ 2105 0518 1A60     	 str r2,[r3]
+ 943:../probe_scope.c ****                                  }
+ 944:../probe_scope.c ****                              }
+ 945:../probe_scope.c ****                          }
+ 946:../probe_scope.c ****                      } else {
+ 947:../probe_scope.c ****                          if (p_sample_prev->Val32U != 0) {
+ 948:../probe_scope.c ****                              if (p_sample_cur->Val32U == 0) {
+ 949:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 950:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 951:../probe_scope.c ****                              }
+ 952:../probe_scope.c ****                          }
+ 953:../probe_scope.c ****                      }
+ 954:../probe_scope.c ****                      break;
+ 2106              	 .loc 1 954 0
+ 2107 051a 68E0     	 b .L81
+ 2108              	.L139:
+ 947:../probe_scope.c ****                              if (p_sample_cur->Val32U == 0) {
+ 2109              	 .loc 1 947 0
+ 2110 051c BB68     	 ldr r3,[r7,#8]
+ 2111 051e 1B68     	 ldr r3,[r3]
+ 2112 0520 002B     	 cmp r3,#0
+ 2113 0522 0BD0     	 beq .L141
+ 948:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 2114              	 .loc 1 948 0
+ 2115 0524 7B68     	 ldr r3,[r7,#4]
+ 2116 0526 1B68     	 ldr r3,[r3]
+ 2117 0528 002B     	 cmp r3,#0
+ 2118 052a 07D1     	 bne .L141
+ 949:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 2119              	 .loc 1 949 0
+ 2120 052c 314B     	 ldr r3,.L159
+ 2121 052e 0122     	 mov r2,#1
+ 2122 0530 1A60     	 str r2,[r3]
+ 950:../probe_scope.c ****                              }
+ 2123              	 .loc 1 950 0
+ 2124 0532 314B     	 ldr r3,.L159+4
+ 2125 0534 1A68     	 ldr r2,[r3]
+ 2126 0536 314B     	 ldr r3,.L159+8
+ 2127 0538 1A60     	 str r2,[r3]
+ 2128              	 .loc 1 954 0
+ 2129 053a 58E0     	 b .L81
+ 2130              	.L141:
+ 2131              	 .loc 1 954 0 is_stmt 0 discriminator 18
+ 2132 053c 57E0     	 b .L81
+ 2133              	.L125:
+ 955:../probe_scope.c ****                      
+ 956:../probe_scope.c ****                 case PROBE_SCOPE_INT32S:
+ 957:../probe_scope.c ****                      if (p_ch->BitEn == 0) {
+ 2134              	 .loc 1 957 0 is_stmt 1
+ 2135 053e FB68     	 ldr r3,[r7,#12]
+ 2136 0540 9B68     	 ldr r3,[r3,#8]
+ 2137 0542 002B     	 cmp r3,#0
+ 2138 0544 19D1     	 bne .L142
+ 958:../probe_scope.c ****                          if (p_sample_prev->Val32S > p_sample_cur->Val32S) {
+ 2139              	 .loc 1 958 0
+ 2140 0546 BB68     	 ldr r3,[r7,#8]
+ 2141 0548 1A68     	 ldr r2,[r3]
+ 2142 054a 7B68     	 ldr r3,[r7,#4]
+ 2143 054c 1B68     	 ldr r3,[r3]
+ 2144 054e 9A42     	 cmp r2,r3
+ 2145 0550 23DD     	 ble .L144
+ 959:../probe_scope.c ****                              if (p_sample_prev->Val32S >= p_ch->TrigLevel.Val32S) {
+ 2146              	 .loc 1 959 0
+ 2147 0552 BB68     	 ldr r3,[r7,#8]
+ 2148 0554 1A68     	 ldr r2,[r3]
+ 2149 0556 FB68     	 ldr r3,[r7,#12]
+ 2150 0558 5B69     	 ldr r3,[r3,#20]
+ 2151 055a 9A42     	 cmp r2,r3
+ 2152 055c 1DDB     	 blt .L144
+ 960:../probe_scope.c ****                                  if (p_sample_cur->Val32S <= p_ch->TrigLevel.Val32S) {
+ 2153              	 .loc 1 960 0
+ 2154 055e 7B68     	 ldr r3,[r7,#4]
+ 2155 0560 1A68     	 ldr r2,[r3]
+ 2156 0562 FB68     	 ldr r3,[r7,#12]
+ 2157 0564 5B69     	 ldr r3,[r3,#20]
+ 2158 0566 9A42     	 cmp r2,r3
+ 2159 0568 17DC     	 bgt .L144
+ 961:../probe_scope.c ****                                      ProbeScope_TrigFlag = 1;
+ 2160              	 .loc 1 961 0
+ 2161 056a 224B     	 ldr r3,.L159
+ 2162 056c 0122     	 mov r2,#1
+ 2163 056e 1A60     	 str r2,[r3]
+ 962:../probe_scope.c ****                                      ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 2164              	 .loc 1 962 0
+ 2165 0570 214B     	 ldr r3,.L159+4
+ 2166 0572 1A68     	 ldr r2,[r3]
+ 2167 0574 214B     	 ldr r3,.L159+8
+ 2168 0576 1A60     	 str r2,[r3]
+ 963:../probe_scope.c ****                                  }
+ 964:../probe_scope.c ****                              }
+ 965:../probe_scope.c ****                          }
+ 966:../probe_scope.c ****                      } else {
+ 967:../probe_scope.c ****                          if (p_sample_prev->Val32S != 0) {
+ 968:../probe_scope.c ****                              if (p_sample_cur->Val32S == 0) {
+ 969:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 970:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 971:../probe_scope.c ****                              }
+ 972:../probe_scope.c ****                          }
+ 973:../probe_scope.c ****                      }
+ 974:../probe_scope.c ****                      break;
+ 2169              	 .loc 1 974 0
+ 2170 0578 39E0     	 b .L81
+ 2171              	.L142:
+ 967:../probe_scope.c ****                              if (p_sample_cur->Val32S == 0) {
+ 2172              	 .loc 1 967 0
+ 2173 057a BB68     	 ldr r3,[r7,#8]
+ 2174 057c 1B68     	 ldr r3,[r3]
+ 2175 057e 002B     	 cmp r3,#0
+ 2176 0580 0BD0     	 beq .L144
+ 968:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 2177              	 .loc 1 968 0
+ 2178 0582 7B68     	 ldr r3,[r7,#4]
+ 2179 0584 1B68     	 ldr r3,[r3]
+ 2180 0586 002B     	 cmp r3,#0
+ 2181 0588 07D1     	 bne .L144
+ 969:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 2182              	 .loc 1 969 0
+ 2183 058a 1A4B     	 ldr r3,.L159
+ 2184 058c 0122     	 mov r2,#1
+ 2185 058e 1A60     	 str r2,[r3]
+ 970:../probe_scope.c ****                              }
+ 2186              	 .loc 1 970 0
+ 2187 0590 194B     	 ldr r3,.L159+4
+ 2188 0592 1A68     	 ldr r2,[r3]
+ 2189 0594 194B     	 ldr r3,.L159+8
+ 2190 0596 1A60     	 str r2,[r3]
+ 2191              	 .loc 1 974 0
+ 2192 0598 29E0     	 b .L81
+ 2193              	.L144:
+ 2194              	 .loc 1 974 0 is_stmt 0 discriminator 19
+ 2195 059a 28E0     	 b .L81
+ 2196              	.L126:
+ 975:../probe_scope.c ****                                     
+ 976:../probe_scope.c ****                 case PROBE_SCOPE_FP32:
+ 977:../probe_scope.c ****                      if (p_sample_prev->ValFP32 > p_sample_cur->ValFP32) {
+ 2197              	 .loc 1 977 0 is_stmt 1
+ 2198 059c BB68     	 ldr r3,[r7,#8]
+ 2199 059e 1A68     	 ldr r2,[r3]
+ 2200 05a0 7B68     	 ldr r3,[r7,#4]
+ 2201 05a2 1B68     	 ldr r3,[r3]
+ 2202 05a4 101C     	 add r0,r2,#0
+ 2203 05a6 191C     	 add r1,r3,#0
+ 2204 05a8 FFF7FEFF 	 bl __aeabi_fcmpgt
+ 2205 05ac 031E     	 sub r3,r0,#0
+ 2206 05ae 00D1     	 bne .L152
+ 978:../probe_scope.c ****                          if (p_sample_prev->ValFP32 >= p_ch->TrigLevel.ValFP32) {
+ 979:../probe_scope.c ****                              if (p_sample_cur->ValFP32 <= p_ch->TrigLevel.ValFP32) {
+ 980:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 981:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 982:../probe_scope.c ****                              }
+ 983:../probe_scope.c ****                          }
+ 984:../probe_scope.c ****                      }
+ 985:../probe_scope.c ****                      break;
+ 2207              	 .loc 1 985 0
+ 2208 05b0 1DE0     	 b .L81
+ 2209              	.L152:
+ 978:../probe_scope.c ****                          if (p_sample_prev->ValFP32 >= p_ch->TrigLevel.ValFP32) {
+ 2210              	 .loc 1 978 0
+ 2211 05b2 BB68     	 ldr r3,[r7,#8]
+ 2212 05b4 1A68     	 ldr r2,[r3]
+ 2213 05b6 FB68     	 ldr r3,[r7,#12]
+ 2214 05b8 5B69     	 ldr r3,[r3,#20]
+ 2215 05ba 101C     	 add r0,r2,#0
+ 2216 05bc 191C     	 add r1,r3,#0
+ 2217 05be FFF7FEFF 	 bl __aeabi_fcmpge
+ 2218 05c2 031E     	 sub r3,r0,#0
+ 2219 05c4 00D1     	 bne .L153
+ 2220              	 .loc 1 985 0
+ 2221 05c6 12E0     	 b .L81
+ 2222              	.L153:
+ 979:../probe_scope.c ****                                  ProbeScope_TrigFlag = 1;
+ 2223              	 .loc 1 979 0
+ 2224 05c8 7B68     	 ldr r3,[r7,#4]
+ 2225 05ca 1A68     	 ldr r2,[r3]
+ 2226 05cc FB68     	 ldr r3,[r7,#12]
+ 2227 05ce 5B69     	 ldr r3,[r3,#20]
+ 2228 05d0 101C     	 add r0,r2,#0
+ 2229 05d2 191C     	 add r1,r3,#0
+ 2230 05d4 FFF7FEFF 	 bl __aeabi_fcmple
+ 2231 05d8 031E     	 sub r3,r0,#0
+ 2232 05da 00D1     	 bne .L154
+ 2233              	 .loc 1 985 0
+ 2234 05dc 07E0     	 b .L81
+ 2235              	.L154:
+ 980:../probe_scope.c ****                                  ProbeScope_TrigIx   = ProbeScope_SampleIxCur; 
+ 2236              	 .loc 1 980 0
+ 2237 05de 054B     	 ldr r3,.L159
+ 2238 05e0 0122     	 mov r2,#1
+ 2239 05e2 1A60     	 str r2,[r3]
+ 981:../probe_scope.c ****                              }
+ 2240              	 .loc 1 981 0
+ 2241 05e4 044B     	 ldr r3,.L159+4
+ 2242 05e6 1A68     	 ldr r2,[r3]
+ 2243 05e8 044B     	 ldr r3,.L159+8
+ 2244 05ea 1A60     	 str r2,[r3]
+ 2245              	 .loc 1 985 0
+ 2246 05ec C046     	 mov r8,r8
+ 2247              	.L81:
+ 986:../probe_scope.c **** #endif                     
+ 987:../probe_scope.c ****             }                          
+ 988:../probe_scope.c ****         }
+ 989:../probe_scope.c ****     }
+ 990:../probe_scope.c **** }
+ 2248              	 .loc 1 990 0
+ 2249 05ee BD46     	 mov sp,r7
+ 2250 05f0 04B0     	 add sp,sp,#16
+ 2251              	 
+ 2252 05f2 80BD     	 pop {r7,pc}
+ 2253              	.L160:
+ 2254              	 .align 2
+ 2255              	.L159:
+ 2256 05f4 00000000 	 .word ProbeScope_TrigFlag
+ 2257 05f8 00000000 	 .word ProbeScope_SampleIxCur
+ 2258 05fc 00000000 	 .word ProbeScope_TrigIx
+ 2259 0600 1C000000 	 .word .L120
+ 2260              	 .cfi_endproc
+ 2261              	.LFE8:
+ 2263              	 .section .bss.temp.4197,"aw",%nobits
+ 2264              	 .align 2
+ 2267              	temp.4197:
+ 2268 0000 00000000 	 .space 4
+ 2269              	 .text
+ 2270              	.Letext0:
+ 2271              	 .file 2 "c:\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 2272              	 .file 3 "c:\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 probe_scope.c
+    {standard input}:18     .bss.ProbeScope_Ch1:00000000 $d
+    {standard input}:21     .bss.ProbeScope_Ch1:00000000 ProbeScope_Ch1
+    {standard input}:24     .bss.ProbeScope_Ch2:00000000 $d
+    {standard input}:27     .bss.ProbeScope_Ch2:00000000 ProbeScope_Ch2
+                            *COM*:00000004 ProbeScope_DataRdyFlag
+                            *COM*:00000004 ProbeScope_InitFlag
+    {standard input}:34     .bss.ProbeScope_Mode:00000000 ProbeScope_Mode
+    {standard input}:35     .bss.ProbeScope_Mode:00000000 $d
+    {standard input}:39     .bss.ProbeScope_TrigChSel:00000000 ProbeScope_TrigChSel
+    {standard input}:40     .bss.ProbeScope_TrigChSel:00000000 $d
+                            *COM*:00000004 ProbeScope_TrigDispPos
+                            *COM*:00000004 ProbeScope_TrigFlag
+                            *COM*:00000004 ProbeScope_TrigHoldOff
+    {standard input}:45     .bss.ProbeScope_TrigHoldOffCtr:00000000 $d
+    {standard input}:48     .bss.ProbeScope_TrigHoldOffCtr:00000000 ProbeScope_TrigHoldOffCtr
+                            *COM*:00000004 ProbeScope_TrigIx
+    {standard input}:52     .bss.ProbeScope_TrigSlope:00000000 $d
+    {standard input}:55     .bss.ProbeScope_TrigSlope:00000000 ProbeScope_TrigSlope
+    {standard input}:58     .bss.ProbeScope_SampleIxPrev:00000000 $d
+    {standard input}:61     .bss.ProbeScope_SampleIxPrev:00000000 ProbeScope_SampleIxPrev
+    {standard input}:64     .bss.ProbeScope_SampleIxCur:00000000 $d
+    {standard input}:67     .bss.ProbeScope_SampleIxCur:00000000 ProbeScope_SampleIxCur
+    {standard input}:70     .bss.ProbeScope_SamplesPreTrigCtr:00000000 $d
+    {standard input}:73     .bss.ProbeScope_SamplesPreTrigCtr:00000000 ProbeScope_SamplesPreTrigCtr
+    {standard input}:76     .bss.ProbeScope_SamplesPostTrigCtr:00000000 $d
+    {standard input}:79     .bss.ProbeScope_SamplesPostTrigCtr:00000000 ProbeScope_SamplesPostTrigCtr
+    {standard input}:82     .bss.ProbeScope_SamplingClkDiv:00000000 $d
+    {standard input}:85     .bss.ProbeScope_SamplingClkDiv:00000000 ProbeScope_SamplingClkDiv
+    {standard input}:88     .bss.ProbeScope_SamplingClkDivCtr:00000000 $d
+    {standard input}:91     .bss.ProbeScope_SamplingClkDivCtr:00000000 ProbeScope_SamplingClkDivCtr
+                            *COM*:00000004 ProbeScope_SamplingClkHz
+    {standard input}:97     .bss.ProbeScope_State:00000000 ProbeScope_State
+    {standard input}:98     .bss.ProbeScope_State:00000000 $d
+    {standard input}:100    .data.ProbeScopeDbg_MaxSamples:00000000 $d
+    {standard input}:103    .data.ProbeScopeDbg_MaxSamples:00000000 ProbeScopeDbg_MaxSamples
+    {standard input}:108    .data.ProbeScopeDbg_MaxCh:00000000 ProbeScopeDbg_MaxCh
+    {standard input}:111    .data.ProbeScopeDbg_16BitEn:00000000 $d
+    {standard input}:114    .data.ProbeScopeDbg_16BitEn:00000000 ProbeScopeDbg_16BitEn
+    {standard input}:117    .data.ProbeScopeDbg_32BitEn:00000000 $d
+    {standard input}:120    .data.ProbeScopeDbg_32BitEn:00000000 ProbeScopeDbg_32BitEn
+    {standard input}:123    .text.ProbeScope_Init:00000000 $t
+    {standard input}:128    .text.ProbeScope_Init:00000000 ProbeScope_Init
+    {standard input}:264    .text.ProbeScope_Init:000000c0 $d
+    {standard input}:2267   .bss.temp.4197:00000000 temp.4197
+    {standard input}:292    .text.ProbeScope_Sampling:00000000 $t
+    {standard input}:297    .text.ProbeScope_Sampling:00000000 ProbeScope_Sampling
+    {standard input}:361    .text.ProbeScope_ModeOff:00000000 ProbeScope_ModeOff
+    {standard input}:497    .text.ProbeScope_ModeTrig:00000000 ProbeScope_ModeTrig
+    {standard input}:404    .text.ProbeScope_ModeContinuous:00000000 ProbeScope_ModeContinuous
+    {standard input}:352    .text.ProbeScope_Sampling:0000003c $d
+    {standard input}:357    .text.ProbeScope_ModeOff:00000000 $t
+    {standard input}:394    .text.ProbeScope_ModeOff:0000001c $d
+    {standard input}:400    .text.ProbeScope_ModeContinuous:00000000 $t
+    {standard input}:761    .text.ProbeScope_SampleChAll:00000000 ProbeScope_SampleChAll
+    {standard input}:1167   .text.ProbeScope_SamplePosNext:00000000 ProbeScope_SamplePosNext
+    {standard input}:483    .text.ProbeScope_ModeContinuous:00000064 $d
+    {standard input}:493    .text.ProbeScope_ModeTrig:00000000 $t
+    {standard input}:1223   .text.ProbeScope_IsTrig:00000000 ProbeScope_IsTrig
+    {standard input}:739    .text.ProbeScope_ModeTrig:00000154 $d
+    {standard input}:757    .text.ProbeScope_SampleChAll:00000000 $t
+    {standard input}:798    .text.ProbeScope_SampleCh:00000000 ProbeScope_SampleCh
+    {standard input}:788    .text.ProbeScope_SampleChAll:00000018 $d
+    {standard input}:794    .text.ProbeScope_SampleCh:00000000 $t
+    {standard input}:842    .rodata.ProbeScope_SampleCh:00000000 $d
+    {standard input}:1157   .text.ProbeScope_SampleCh:000001f8 $d
+    {standard input}:1163   .text.ProbeScope_SamplePosNext:00000000 $t
+    {standard input}:1208   .text.ProbeScope_SamplePosNext:0000002c $d
+    {standard input}:1219   .text.ProbeScope_IsTrig:00000000 $t
+    {standard input}:1316   .rodata.ProbeScope_IsTrig:00000000 $d
+    {standard input}:1745   .text.ProbeScope_IsTrig:000002f0 $d
+    {standard input}:1756   .text.ProbeScope_IsTrig:00000314 $t
+    {standard input}:2256   .text.ProbeScope_IsTrig:000005f4 $d
+    {standard input}:2264   .bss.temp.4197:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_fcmplt
+__aeabi_fcmple
+__aeabi_fcmpge
+__aeabi_fcmpgt

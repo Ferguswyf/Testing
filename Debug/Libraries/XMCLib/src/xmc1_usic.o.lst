@@ -1,0 +1,234 @@
+   1              	 .cpu cortex-m0
+   2              	 .fpu softvfp
+   3              	 .eabi_attribute 20,1
+   4              	 .eabi_attribute 21,1
+   5              	 .eabi_attribute 23,3
+   6              	 .eabi_attribute 24,1
+   7              	 .eabi_attribute 25,1
+   8              	 .eabi_attribute 26,1
+   9              	 .eabi_attribute 30,6
+  10              	 .eabi_attribute 34,0
+  11              	 .eabi_attribute 18,4
+  12              	 .code 16
+  13              	 .file "xmc1_usic.c"
+  14              	 .text
+  15              	.Ltext0:
+  16              	 .cfi_sections .debug_frame
+  17              	 .section .text.XMC_USIC_Enable,"ax",%progbits
+  18              	 .align 2
+  19              	 .global XMC_USIC_Enable
+  20              	 .code 16
+  21              	 .thumb_func
+  23              	XMC_USIC_Enable:
+  24              	.LFB93:
+  25              	 .file 1 "../Libraries/XMCLib/src/xmc1_usic.c"
+   1:../Libraries/XMCLib/src/xmc1_usic.c **** /**
+   2:../Libraries/XMCLib/src/xmc1_usic.c ****  * @file xmc1_usic.c
+   3:../Libraries/XMCLib/src/xmc1_usic.c ****  * @date 2015-06-20 
+   4:../Libraries/XMCLib/src/xmc1_usic.c ****  *
+   5:../Libraries/XMCLib/src/xmc1_usic.c ****  * @cond
+   6:../Libraries/XMCLib/src/xmc1_usic.c ****  **************************************************************************************************
+   7:../Libraries/XMCLib/src/xmc1_usic.c ****  * XMClib v2.0.0 - XMC Peripheral Driver Library
+   8:../Libraries/XMCLib/src/xmc1_usic.c ****  *
+   9:../Libraries/XMCLib/src/xmc1_usic.c ****  * Copyright (c) 2015, Infineon Technologies AG
+  10:../Libraries/XMCLib/src/xmc1_usic.c ****  * All rights reserved.                        
+  11:../Libraries/XMCLib/src/xmc1_usic.c ****  *                                             
+  12:../Libraries/XMCLib/src/xmc1_usic.c ****  * Redistribution and use in source and binary forms, with or without modification,are permitted pr
+  13:../Libraries/XMCLib/src/xmc1_usic.c ****  * following conditions are met:   
+  14:../Libraries/XMCLib/src/xmc1_usic.c ****  *                                                                              
+  15:../Libraries/XMCLib/src/xmc1_usic.c ****  * Redistributions of source code must retain the above copyright notice, this list of conditions a
+  16:../Libraries/XMCLib/src/xmc1_usic.c ****  * disclaimer.                        
+  17:../Libraries/XMCLib/src/xmc1_usic.c ****  * 
+  18:../Libraries/XMCLib/src/xmc1_usic.c ****  * Redistributions in binary form must reproduce the above copyright notice, this list of condition
+  19:../Libraries/XMCLib/src/xmc1_usic.c ****  * disclaimer in the documentation and/or other materials provided with the distribution.          
+  20:../Libraries/XMCLib/src/xmc1_usic.c ****  * 
+  21:../Libraries/XMCLib/src/xmc1_usic.c ****  * Neither the name of the copyright holders nor the names of its contributors may be used to endor
+  22:../Libraries/XMCLib/src/xmc1_usic.c ****  * products derived from this software without specific prior written permission.                  
+  23:../Libraries/XMCLib/src/xmc1_usic.c ****  *                                                                              
+  24:../Libraries/XMCLib/src/xmc1_usic.c ****  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR I
+  25:../Libraries/XMCLib/src/xmc1_usic.c ****  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTI
+  26:../Libraries/XMCLib/src/xmc1_usic.c ****  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, IN
+  27:../Libraries/XMCLib/src/xmc1_usic.c ****  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBS
+  28:../Libraries/XMCLib/src/xmc1_usic.c ****  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THE
+  29:../Libraries/XMCLib/src/xmc1_usic.c ****  * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+  30:../Libraries/XMCLib/src/xmc1_usic.c ****  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                            
+  31:../Libraries/XMCLib/src/xmc1_usic.c ****  *                                                                              
+  32:../Libraries/XMCLib/src/xmc1_usic.c ****  * To improve the quality of the software, users are encouraged to share modifications, enhancement
+  33:../Libraries/XMCLib/src/xmc1_usic.c ****  * Infineon Technologies AG dave@infineon.com).                                                    
+  34:../Libraries/XMCLib/src/xmc1_usic.c ****  **************************************************************************************************
+  35:../Libraries/XMCLib/src/xmc1_usic.c ****  *
+  36:../Libraries/XMCLib/src/xmc1_usic.c ****  * Change History
+  37:../Libraries/XMCLib/src/xmc1_usic.c ****  * --------------
+  38:../Libraries/XMCLib/src/xmc1_usic.c ****  *
+  39:../Libraries/XMCLib/src/xmc1_usic.c ****  * 2015-02-16:
+  40:../Libraries/XMCLib/src/xmc1_usic.c ****  *     - Initial <br>
+  41:../Libraries/XMCLib/src/xmc1_usic.c ****  *      
+  42:../Libraries/XMCLib/src/xmc1_usic.c ****  * @endcond 
+  43:../Libraries/XMCLib/src/xmc1_usic.c ****  *
+  44:../Libraries/XMCLib/src/xmc1_usic.c ****  */
+  45:../Libraries/XMCLib/src/xmc1_usic.c **** 
+  46:../Libraries/XMCLib/src/xmc1_usic.c **** /**************************************************************************************************
+  47:../Libraries/XMCLib/src/xmc1_usic.c ****  * HEADER FILES
+  48:../Libraries/XMCLib/src/xmc1_usic.c ****  **************************************************************************************************
+  49:../Libraries/XMCLib/src/xmc1_usic.c **** #include "xmc_usic.h"
+  50:../Libraries/XMCLib/src/xmc1_usic.c **** #include "xmc_scu.h"
+  51:../Libraries/XMCLib/src/xmc1_usic.c **** 
+  52:../Libraries/XMCLib/src/xmc1_usic.c **** #if UC_FAMILY == XMC1
+  53:../Libraries/XMCLib/src/xmc1_usic.c ****  
+  54:../Libraries/XMCLib/src/xmc1_usic.c **** /**************************************************************************************************
+  55:../Libraries/XMCLib/src/xmc1_usic.c ****  * API IMPLEMENTATION
+  56:../Libraries/XMCLib/src/xmc1_usic.c ****  **************************************************************************************************
+  57:../Libraries/XMCLib/src/xmc1_usic.c **** /**
+  58:../Libraries/XMCLib/src/xmc1_usic.c ****  * @brief API to enable the USIC driver
+  59:../Libraries/XMCLib/src/xmc1_usic.c ****  * @retval void
+  60:../Libraries/XMCLib/src/xmc1_usic.c ****  *
+  61:../Libraries/XMCLib/src/xmc1_usic.c ****  */
+  62:../Libraries/XMCLib/src/xmc1_usic.c **** void XMC_USIC_Enable(XMC_USIC_t *const usic)
+  63:../Libraries/XMCLib/src/xmc1_usic.c **** {
+  26              	 .loc 1 63 0
+  27              	 .cfi_startproc
+  28 0000 80B5     	 push {r7,lr}
+  29              	.LCFI0:
+  30              	 .cfi_def_cfa_offset 8
+  31              	 .cfi_offset 7,-8
+  32              	 .cfi_offset 14,-4
+  33 0002 82B0     	 sub sp,sp,#8
+  34              	.LCFI1:
+  35              	 .cfi_def_cfa_offset 16
+  36 0004 00AF     	 add r7,sp,#0
+  37              	.LCFI2:
+  38              	 .cfi_def_cfa_register 7
+  39 0006 7860     	 str r0,[r7,#4]
+  64:../Libraries/XMCLib/src/xmc1_usic.c ****   if (usic == XMC_USIC0)
+  40              	 .loc 1 64 0
+  41 0008 7B68     	 ldr r3,[r7,#4]
+  42 000a 044A     	 ldr r2,.L3
+  43 000c 9342     	 cmp r3,r2
+  44 000e 02D1     	 bne .L1
+  65:../Libraries/XMCLib/src/xmc1_usic.c ****   {
+  66:../Libraries/XMCLib/src/xmc1_usic.c **** 	XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_USIC0);
+  45              	 .loc 1 66 0
+  46 0010 0820     	 mov r0,#8
+  47 0012 FFF7FEFF 	 bl XMC_SCU_CLOCK_UngatePeripheralClock
+  48              	.L1:
+  67:../Libraries/XMCLib/src/xmc1_usic.c ****   }
+  68:../Libraries/XMCLib/src/xmc1_usic.c **** #if defined(USIC1)  
+  69:../Libraries/XMCLib/src/xmc1_usic.c ****   else if (usic == XMC_USIC1)
+  70:../Libraries/XMCLib/src/xmc1_usic.c ****   {
+  71:../Libraries/XMCLib/src/xmc1_usic.c ****     XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_USIC1);
+  72:../Libraries/XMCLib/src/xmc1_usic.c ****   }
+  73:../Libraries/XMCLib/src/xmc1_usic.c **** #endif  
+  74:../Libraries/XMCLib/src/xmc1_usic.c **** #if defined(USIC2)  
+  75:../Libraries/XMCLib/src/xmc1_usic.c ****   else if (usic == XMC_USIC2)
+  76:../Libraries/XMCLib/src/xmc1_usic.c ****   {
+  77:../Libraries/XMCLib/src/xmc1_usic.c **** 	XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_USIC2);
+  78:../Libraries/XMCLib/src/xmc1_usic.c ****   }
+  79:../Libraries/XMCLib/src/xmc1_usic.c **** #endif  
+  80:../Libraries/XMCLib/src/xmc1_usic.c ****   else
+  81:../Libraries/XMCLib/src/xmc1_usic.c ****   {
+  82:../Libraries/XMCLib/src/xmc1_usic.c **** 	XMC_ASSERT("USIC module not available", 0/*Always*/);
+  83:../Libraries/XMCLib/src/xmc1_usic.c ****   }
+  84:../Libraries/XMCLib/src/xmc1_usic.c **** }
+  49              	 .loc 1 84 0
+  50 0016 BD46     	 mov sp,r7
+  51 0018 02B0     	 add sp,sp,#8
+  52              	 
+  53 001a 80BD     	 pop {r7,pc}
+  54              	.L4:
+  55              	 .align 2
+  56              	.L3:
+  57 001c 08000048 	 .word 1207959560
+  58              	 .cfi_endproc
+  59              	.LFE93:
+  61              	 .section .text.XMC_USIC_Disable,"ax",%progbits
+  62              	 .align 2
+  63              	 .global XMC_USIC_Disable
+  64              	 .code 16
+  65              	 .thumb_func
+  67              	XMC_USIC_Disable:
+  68              	.LFB94:
+  85:../Libraries/XMCLib/src/xmc1_usic.c **** 
+  86:../Libraries/XMCLib/src/xmc1_usic.c **** /**
+  87:../Libraries/XMCLib/src/xmc1_usic.c ****  * @brief API to Disable the USIC driver
+  88:../Libraries/XMCLib/src/xmc1_usic.c ****  * @retval void
+  89:../Libraries/XMCLib/src/xmc1_usic.c ****  *
+  90:../Libraries/XMCLib/src/xmc1_usic.c ****  */
+  91:../Libraries/XMCLib/src/xmc1_usic.c **** void XMC_USIC_Disable(XMC_USIC_t *const usic)
+  92:../Libraries/XMCLib/src/xmc1_usic.c **** {
+  69              	 .loc 1 92 0
+  70              	 .cfi_startproc
+  71 0000 80B5     	 push {r7,lr}
+  72              	.LCFI3:
+  73              	 .cfi_def_cfa_offset 8
+  74              	 .cfi_offset 7,-8
+  75              	 .cfi_offset 14,-4
+  76 0002 82B0     	 sub sp,sp,#8
+  77              	.LCFI4:
+  78              	 .cfi_def_cfa_offset 16
+  79 0004 00AF     	 add r7,sp,#0
+  80              	.LCFI5:
+  81              	 .cfi_def_cfa_register 7
+  82 0006 7860     	 str r0,[r7,#4]
+  93:../Libraries/XMCLib/src/xmc1_usic.c ****   if (usic == (XMC_USIC_t *)USIC0)
+  83              	 .loc 1 93 0
+  84 0008 7B68     	 ldr r3,[r7,#4]
+  85 000a 044A     	 ldr r2,.L7
+  86 000c 9342     	 cmp r3,r2
+  87 000e 02D1     	 bne .L5
+  94:../Libraries/XMCLib/src/xmc1_usic.c ****   {
+  95:../Libraries/XMCLib/src/xmc1_usic.c ****     XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_USIC0);
+  88              	 .loc 1 95 0
+  89 0010 0820     	 mov r0,#8
+  90 0012 FFF7FEFF 	 bl XMC_SCU_CLOCK_GatePeripheralClock
+  91              	.L5:
+  96:../Libraries/XMCLib/src/xmc1_usic.c ****   }
+  97:../Libraries/XMCLib/src/xmc1_usic.c **** #if defined(USIC1)  
+  98:../Libraries/XMCLib/src/xmc1_usic.c ****   else if (usic == (XMC_USIC_t *)USIC1)
+  99:../Libraries/XMCLib/src/xmc1_usic.c ****   {
+ 100:../Libraries/XMCLib/src/xmc1_usic.c ****     XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_USIC1);
+ 101:../Libraries/XMCLib/src/xmc1_usic.c ****   }
+ 102:../Libraries/XMCLib/src/xmc1_usic.c **** #endif  
+ 103:../Libraries/XMCLib/src/xmc1_usic.c **** #if defined(USIC2)  
+ 104:../Libraries/XMCLib/src/xmc1_usic.c ****   else if (usic == (XMC_USIC_t *)USIC2)
+ 105:../Libraries/XMCLib/src/xmc1_usic.c ****   {
+ 106:../Libraries/XMCLib/src/xmc1_usic.c **** 	XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_USIC2);
+ 107:../Libraries/XMCLib/src/xmc1_usic.c ****   }
+ 108:../Libraries/XMCLib/src/xmc1_usic.c **** #endif  
+ 109:../Libraries/XMCLib/src/xmc1_usic.c ****   else
+ 110:../Libraries/XMCLib/src/xmc1_usic.c ****   {
+ 111:../Libraries/XMCLib/src/xmc1_usic.c ****     XMC_ASSERT("USIC module not available", 0/*Always*/);
+ 112:../Libraries/XMCLib/src/xmc1_usic.c ****   }
+ 113:../Libraries/XMCLib/src/xmc1_usic.c ****   
+ 114:../Libraries/XMCLib/src/xmc1_usic.c **** }
+  92              	 .loc 1 114 0
+  93 0016 BD46     	 mov sp,r7
+  94 0018 02B0     	 add sp,sp,#8
+  95              	 
+  96 001a 80BD     	 pop {r7,pc}
+  97              	.L8:
+  98              	 .align 2
+  99              	.L7:
+ 100 001c 08000048 	 .word 1207959560
+ 101              	 .cfi_endproc
+ 102              	.LFE94:
+ 104              	 .text
+ 105              	.Letext0:
+ 106              	 .file 2 "c:\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 107              	 .file 3 "c:\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 108              	 .file 4 "D:/SoftWar_Debug/XMC1300_GPIO/Libraries/CMSIS/Infineon/XMC1300_series/Include/XMC1300.h"
+ 109              	 .file 5 "D:/SoftWar_Debug/XMC1300_GPIO/Libraries/XMCLib/inc/xmc_usic.h"
+ 110              	 .file 6 "D:/SoftWar_Debug/XMC1300_GPIO/Libraries/XMCLib/inc/xmc1_scu.h"
+ 111              	 .file 7 "D:/SoftWar_Debug/XMC1300_GPIO/Libraries/CMSIS/Infineon/XMC1300_series/Include/system_XMC1300.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 xmc1_usic.c
+    {standard input}:18     .text.XMC_USIC_Enable:00000000 $t
+    {standard input}:23     .text.XMC_USIC_Enable:00000000 XMC_USIC_Enable
+    {standard input}:57     .text.XMC_USIC_Enable:0000001c $d
+    {standard input}:62     .text.XMC_USIC_Disable:00000000 $t
+    {standard input}:67     .text.XMC_USIC_Disable:00000000 XMC_USIC_Disable
+    {standard input}:100    .text.XMC_USIC_Disable:0000001c $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+XMC_SCU_CLOCK_UngatePeripheralClock
+XMC_SCU_CLOCK_GatePeripheralClock
